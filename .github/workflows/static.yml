@@ -36,4 +36,14 @@ jobs:
         uses: actions/configure-pages@v5
 
       # Paso para cargar el artefacto al servidor de GitHub Pages
-      - name:
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # Subir todo el repositorio
+          path: '.'
+      
+      # Paso final para desplegar a GitHub Pages
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+        
