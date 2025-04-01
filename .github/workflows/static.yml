@@ -1,49 +1,39 @@
 name: Shiptrack Deployment
 
 on:
-  # Se ejecuta cuando se hace push al branch principal
   push:
     branches: ["main"]
-
-  # Permite ejecutar el flujo de trabajo manualmente desde la pestaña de Actions
   workflow_dispatch:
 
-# Establece los permisos del GITHUB_TOKEN para permitir el despliegue a GitHub Pages
 permissions:
   contents: read
   pages: write
   id-token: write
 
-# Configuración de concurrencia para asegurar que solo se ejecute un despliegue a la vez
 concurrency:
   group: "pages"
   cancel-in-progress: false
 
 jobs:
-  # Trabajo único para despliegue
   deploy:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      # Paso para hacer checkout del repositorio
       - name: Checkout
         uses: actions/checkout@v4
       
-      # Paso para configurar GitHub Pages
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
-      # Paso para cargar el artefacto al servidor de GitHub Pages
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # Subir todo el repositorio
+          # Cambia el nombre del artefacto para que sea único
+          name: "unique-github-pages-artifact"
           path: '.'
-      
-      # Paso final para desplegar a GitHub Pages
+
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-        
