@@ -27,11 +27,11 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
+      # Aquí aseguramos que el nombre del artefacto sea "github-pages"
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # Cambia el nombre del artefacto para que sea único
-          name: "unique-github-pages-artifact"
+          name: "github-pages"   # Asegúrate de que el nombre sea el mismo
           path: '.'
 
       - name: Deploy to GitHub Pages
