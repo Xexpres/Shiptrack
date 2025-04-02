@@ -66,7 +66,6 @@
         <h2>Consulta tu Bill of Lading</h2>
         <input type="text" id="blNumber" placeholder="Ingresa tu número de Bill of Lading">
         <button onclick="buscarBL()">Buscar</button>
-        <p id="resultado"></p>
     </div>
 
     <footer>
@@ -77,14 +76,18 @@
         function buscarBL() {
             var bl = document.getElementById("blNumber").value;
             if (bl) {
-                document.getElementById("resultado").innerText = "Buscando información para: " + bl;
-                // Aquí iría la lógica de verificación del BL, como conectarse a la API o realizar la búsqueda en plataformas externas.
-                // Por ahora solo mostramos un mensaje.
+                // Redirige a la página de MSC con el número de Bill of Lading
+                var url = `https://www.msc.com/en/track-a-shipment?bl=${bl}`;
+                window.location.href = url;
             } else {
-                document.getElementById("resultado").innerText = "Por favor, ingresa un número de Bill of Lading.";
+                alert("Por favor, ingresa un número de Bill of Lading.");
             }
         }
     </script>
+
+</body>
+</html>
+
 
 </body>
 </html>
