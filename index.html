@@ -3,45 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MSC - Mi Web</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Shiptrack - Rastreo de Cargas</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        header {
+            background-color: #003366;
+            color: white;
+            padding: 15px;
+            text-align: center;
+        }
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            font-size: 24px;
+            color: #003366;
+        }
+        input[type="text"], button {
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #003366;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #002244;
+        }
+        footer {
+            text-align: center;
+            padding: 10px;
+            background-color: #003366;
+            color: white;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+    </style>
 </head>
 <body>
-    <header>
-        <nav>
-            <div class="logo">MSC</div>
-            <ul>
-                <li><a href="#">Inicio</a></li>
-                <li><a href="#">Servicios</a></li>
-                <li><a href="#">Sobre Nosotros</a></li>
-                <li><a href="#">Contacto</a></li>
-            </ul>
-        </nav>
-    </header>
-    
-    <section class="hero">
-        <h1>Bienvenido a MSC</h1>
-        <p>Conectando el mundo a través de soluciones logísticas innovadoras.</p>
-        <a href="#" class="btn">Descubre Más</a>
-    </section>
 
-    <section class="services">
-        <div class="service">
-            <h2>Transporte Marítimo</h2>
-            <p>Soluciones globales para tu carga.</p>
-        </div>
-        <div class="service">
-            <h2>Logística Integral</h2>
-            <p>Optimización completa de la cadena de suministro.</p>
-        </div>
-        <div class="service">
-            <h2>Innovación Digital</h2>
-            <p>Tecnología avanzada para una mejor gestión.</p>
-        </div>
-    </section>
-    
+    <header>
+        <h1>Shiptrack - Rastreo de Cargas</h1>
+    </header>
+
+    <div class="container">
+        <h2>Consulta tu Bill of Lading</h2>
+        <input type="text" id="blNumber" placeholder="Ingresa tu número de Bill of Lading">
+        <button onclick="buscarBL()">Buscar</button>
+        <p id="resultado"></p>
+    </div>
+
     <footer>
-        <p>&copy; 2025 MSC - Todos los derechos reservados</p>
+        <p>&copy; 2025 Shiptrack</p>
     </footer>
+
+    <script>
+        function buscarBL() {
+            var bl = document.getElementById("blNumber").value;
+            if (bl) {
+                document.getElementById("resultado").innerText = "Buscando información para: " + bl;
+                // Aquí iría la lógica de verificación del BL, como conectarse a la API o realizar la búsqueda en plataformas externas.
+                // Por ahora solo mostramos un mensaje.
+            } else {
+                document.getElementById("resultado").innerText = "Por favor, ingresa un número de Bill of Lading.";
+            }
+        }
+    </script>
+
 </body>
 </html>
