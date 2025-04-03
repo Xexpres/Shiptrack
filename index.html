@@ -5,110 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shiptrack - Rastreo de Cargas</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-        }
-        header {
-            background-color: #003366;
-            color: white;
-            padding: 15px;
-            text-align: center;
-        }
-        .container {
-            max-width: 600px;
-            margin: 50px auto;
-            background-color: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        h2 {
-            font-size: 24px;
-            color: #003366;
-        }
-        input[type="text"], button {
-            width: 100%;
-            padding: 15px;
-            margin: 10px 0;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-        button {
-            background-color: #003366;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #002244;
-        }
-        #resultado {
-            margin-top: 20px;
-            padding: 15px;
-            background: #e3f2fd;
-            border-radius: 4px;
-            font-size: 16px;
-            color: #333;
-        }
-        footer {
-            text-align: center;
-            padding: 10px;
-            background-color: #003366;
-            color: white;
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-        }
+        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+        input, button { padding: 10px; margin: 10px; font-size: 16px; }
     </style>
 </head>
 <body>
 
-    <header>
-        <h1>Shiptrack - Rastreo de Cargas</h1>
-    </header>
-
-    <div class="container">
-        <h2>Consulta tu Bill of Lading</h2>
-        <input type="text" id="blNumber" placeholder="Ingresa tu número de Bill of Lading">
-        <button onclick="buscarBL()">Buscar</button>
-        <div id="resultado">Aquí se mostrará la información...</div>
-    </div>
-
-    <footer>
-        <p>&copy; 2025 Shiptrack</p>
-    </footer>
+    <h1>Shiptrack - Rastreo de Cargas</h1>
+    <input type="text" id="blNumber" placeholder="Ingresa tu número de Bill of Lading">
+    <button onclick="buscarBL()">Buscar</button>
 
     <script>
-        async function buscarBL() {
+        function buscarBL() {
             var bl = document.getElementById("blNumber").value;
             if (bl) {
-                document.getElementById("resultado").innerText = "Buscando información...";
-                
-                let url = `https://www.searates.com/services/tracking/getTrack?bl=${bl}`;
-                
-                try {
-                    let response = await fetch(url);
-                    let data = await response.json();
-                    
-                    if (data.status === "success" && data.result.length > 0) {
-                        let trackingInfo = data.result[0];
-                        document.getElementById("resultado").innerHTML = `
-                            <p><strong>Estado:</strong> ${trackingInfo.status}</p>
-                            <p><strong>Ubicación:</strong> ${trackingInfo.location}</p>
-                            <p><strong>Última Actualización:</strong> ${trackingInfo.date}</p>
-                        `;
-                    } else {
-                        document.getElementById("resultado").innerText = "No se encontró información.";
-                    }
-                } catch (error) {
-                    document.getElementById("resultado").innerText = "Error al obtener la información.";
-                    console.error(error);
-                }
+                // Redirige a MSC con el número ingresado
+                window.location.href = `https://www.msc.com/en/track-a-shipment?bl=${bl}`;
             } else {
-                document.getElementById("resultado").innerText = "Por favor, ingresa un número de Bill of Lading.";
+                alert("Por favor, ingresa un número de Bill of Lading.");
             }
         }
     </script>
