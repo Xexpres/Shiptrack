@@ -87,23 +87,22 @@
             if (bl) {
                 document.getElementById("resultado").innerText = "Buscando información...";
                 
-                // Usamos un proxy para evitar CORS
-                let proxy = "https://corsproxy.io/?";
-                let url = `https://www.msc.com/en/track-a-shipment?bl=${bl}`;
+                let url = `https://www.searates.com/services/tracking/getTrack?bl=${bl}`;
                 
                 try {
-                    let response = await fetch(proxy + url);
-                    let html = await response.text();
+                    let response = await fetch(url);
+                    let data = await response.json();
                     
-                    // Extraer información usando DOMParser
-                    let parser = new DOMParser();
-                    let doc = parser.parseFromString(html, "text/html");
-                    
-                    // Buscar la información en la página de MSC
-                    let info = doc.querySelector(".shipment-info"); // Asegúrate de que esta clase es correcta
-                    let resultadoTexto = info ? info.innerText : "No se encontró información.";
-                    
-                    document.getElementById("resultado").innerText = resultadoTexto;
+                    if (data.status === "success" && data.result.length > 0) {
+                        let trackingInfo = data.result[0];
+                        document.getElementById("resultado").innerHTML = `
+                            <p><strong>Estado:</strong> ${trackingInfo.status}</p>
+                            <p><strong>Ubicación:</strong> ${trackingInfo.location}</p>
+                            <p><strong>Última Actualización:</strong> ${trackingInfo.date}</p>
+                        `;
+                    } else {
+                        document.getElementById("resultado").innerText = "No se encontró información.";
+                    }
                 } catch (error) {
                     document.getElementById("resultado").innerText = "Error al obtener la información.";
                     console.error(error);
@@ -116,4 +115,3 @@
 
 </body>
 </html>
-
