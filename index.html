@@ -45,6 +45,14 @@
         button:hover {
             background-color: #002244;
         }
+        #resultado {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e3f2fd;
+            border-radius: 4px;
+            font-size: 16px;
+            color: #333;
+        }
         footer {
             text-align: center;
             padding: 10px;
@@ -66,6 +74,7 @@
         <h2>Consulta tu Bill of Lading</h2>
         <input type="text" id="blNumber" placeholder="Ingresa tu número de Bill of Lading">
         <button onclick="buscarBL()">Buscar</button>
+        <div id="resultado">Aquí se mostrará la información...</div>
     </div>
 
     <footer>
@@ -73,14 +82,34 @@
     </footer>
 
     <script>
-        function buscarBL() {
+        async function buscarBL() {
             var bl = document.getElementById("blNumber").value;
             if (bl) {
-                // Redirige a la página de MSC con el número de Bill of Lading
-                var url = `https://www.msc.com/en/track-a-shipment?bl=${bl}`;
-                window.location.href = url;
+                document.getElementById("resultado").innerText = "Buscando información...";
+                
+                // Usamos un proxy para evitar CORS
+                let proxy = "https://corsproxy.io/?";
+                let url = `https://www.msc.com/en/track-a-shipment?bl=${bl}`;
+                
+                try {
+                    let response = await fetch(proxy + url);
+                    let html = await response.text();
+                    
+                    // Extraer información usando DOMParser
+                    let parser = new DOMParser();
+                    let doc = parser.parseFromString(html, "text/html");
+                    
+                    // Buscar la información en la página de MSC
+                    let info = doc.querySelector(".shipment-info"); // Asegúrate de que esta clase es correcta
+                    let resultadoTexto = info ? info.innerText : "No se encontró información.";
+                    
+                    document.getElementById("resultado").innerText = resultadoTexto;
+                } catch (error) {
+                    document.getElementById("resultado").innerText = "Error al obtener la información.";
+                    console.error(error);
+                }
             } else {
-                alert("Por favor, ingresa un número de Bill of Lading.");
+                document.getElementById("resultado").innerText = "Por favor, ingresa un número de Bill of Lading.";
             }
         }
     </script>
@@ -88,6 +117,3 @@
 </body>
 </html>
 
-
-</body>
-</html>
