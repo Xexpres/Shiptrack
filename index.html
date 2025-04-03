@@ -10,28 +10,24 @@
             margin: 0;
             padding: 0;
             background-color: #f4f4f4;
+            text-align: center;
         }
         header {
             background-color: #003366;
             color: white;
             padding: 15px;
-            text-align: center;
         }
         .container {
             max-width: 600px;
-            margin: 50px auto;
+            margin: 20px auto;
             background-color: white;
-            padding: 30px;
+            padding: 20px;
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
-        h2 {
-            font-size: 24px;
-            color: #003366;
-        }
-        input[type="text"], button {
+        input, button {
             width: 100%;
-            padding: 15px;
+            padding: 10px;
             margin: 10px 0;
             border: 1px solid #ddd;
             border-radius: 4px;
@@ -45,13 +41,10 @@
         button:hover {
             background-color: #002244;
         }
-        #resultado {
-            margin-top: 20px;
-            padding: 15px;
-            background: #e3f2fd;
-            border-radius: 4px;
-            font-size: 16px;
-            color: #333;
+        .map-container {
+            margin: 20px auto;
+            width: 90%;
+            height: 500px;
         }
         footer {
             text-align: center;
@@ -63,6 +56,8 @@
             width: 100%;
         }
     </style>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 </head>
 <body>
 
@@ -72,10 +67,11 @@
 
     <div class="container">
         <h2>Consulta tu Bill of Lading</h2>
-        <input type="text" id="blNumber" value="MSC123456789" placeholder="Ingresa tu número de Bill of Lading">
+        <input type="text" id="blNumber" placeholder="Ingresa tu número de Bill of Lading">
         <button onclick="buscarBL()">Buscar</button>
-        <div id="resultado">Aquí se mostrará la información...</div>
     </div>
+
+    <div id="map" class="map-container"></div>
 
     <footer>
         <p>&copy; 2025 Shiptrack</p>
@@ -87,9 +83,27 @@
             if (bl) {
                 window.location.href = `https://www.msc.com/en/track-a-shipment?bl=${bl}`;
             } else {
-                document.getElementById("resultado").innerText = "Por favor, ingresa un número de Bill of Lading.";
+                alert("Por favor, ingresa un número de Bill of Lading.");
             }
         }
+
+        var map = L.map('map').setView([20, 0], 2);
+        
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+        
+        var ports = [
+            { name: "Puerto de Shanghái", coords: [31.2304, 121.4737] },
+            { name: "Puerto de Singapur", coords: [1.3521, 103.8198] },
+            { name: "Puerto de Róterdam", coords: [51.9225, 4.4792] },
+            { name: "Puerto de Los Ángeles", coords: [33.7405, -118.2724] },
+            { name: "Puerto de Hamburgo", coords: [53.5511, 9.9937] }
+        ];
+        
+        ports.forEach(port => {
+            L.marker(port.coords).addTo(map).bindPopup(port.name);
+        });
     </script>
 
 </body>
