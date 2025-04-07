@@ -74,77 +74,80 @@
     <div id="map" class="map-container"></div>
 
     <footer>
-        <p>&copy; 2025 Shiptrack</p>
+        <p>&copy; 2025 Shiptrack | Desarrollado por Juan Giraldo y Dylan Diaz</p>
     </footer>
 
     <script>
         function buscarBL() {
-            var bl = document.getElementById("blNumber").value;
+            var bl = document.getElementById("blNumber").value.trim();
             if (bl) {
-                window.location.href = `https://www.msc.com/en/track-a-shipment?bl=${bl}`;
+                const trackingSites = [
+                    `https://www.msc.com/en/track-a-shipment?bl=${bl}`,
+                    `https://www.one-line.com/en/standard-page/track-trace?bl=${bl}`,
+                    `https://www.maersk.com/tracking/${bl}`,
+                    `https://www.hapag-lloyd.com/en/online-business/track/track-by-booking.html?bl=${bl}`,
+                    `https://www.evergreen-line.com/ticket/Tracking?bl=${bl}`
+                ];
+
+                let index = 0;
+                const openNext = () => {
+                    if (index < trackingSites.length) {
+                        window.open(trackingSites[index], '_blank');
+                        index++;
+                        setTimeout(openNext, 300);
+                    }
+                };
+
+                openNext();
             } else {
                 alert("Por favor, ingresa un número de Bill of Lading.");
             }
         }
 
         var map = L.map('map').setView([20, 0], 2);
-        
+
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; OpenStreetMap contributors'
         }).addTo(map);
-        
+
         var ports = [
-            { nombre: "Puerto de Shanghái", coords: [31.2304, 121.4737] },
-            { nombre: "Puerto de Singapur", coords: [1.3521, 103.8198] },
-            { nombre: "Puerto de Róterdam", coords: [51.9225, 4.4792] },
-            { nombre: "Puerto de Los Ángeles", coords: [33.7405, -118.2724] },
-            { nombre: "Puerto de Hamburgo", coords: [53.5511, 9.9937] },
-            { nombre: "Puerto de Busan", coords: [35.1796, 129.0756] },
-            { nombre: "Puerto de Hong Kong", coords: [22.3193, 114.1694] },
-            { nombre: "Puerto de Ningbo-Zhoushan", coords: [29.8683, 121.5440] },
-            { nombre: "Puerto de Guangzhou", coords: [23.1291, 113.2644] },
-            { nombre: "Puerto de Dubai (Jebel Ali)", coords: [25.2744, 55.3086] },
-            { nombre: "Puerto de Tanjung Pelepas", coords: [1.3626, 103.5433] },
-            { nombre: "Puerto de Amberes", coords: [51.2194, 4.4025] },
-            { nombre: "Puerto de Nueva York y Nueva Jersey", coords: [40.6848, -74.0210] },
-            { nombre: "Puerto de Long Beach", coordenadas: [33.7542, -118.2165] },
-            { nombre: "Puerto de Qingdao", coords: [36.0660, 120.3826] },
-            { nombre: "Puerto de Kaohsiung", coords: [22.6163, 120.3079] },
-            { nombre: "Puerto de Colombo", coords: [6.9271, 79.8612] },
-            { nombre: "Puerto de Santos", coords: [-23.9618, -46.3333] },
-            { nombre: "Puerto de Algeciras", coords: [36.1264, -5.4538] },
-            { nombre: "Puerto de Valencia", coords: [39.4699, -0.3763] },
-            { nombre: "Puerto de Yokohama", coords: [35.4437, 139.6380] },
-            { nombre: "Puerto de Marsella", coords: [43.2965, 5.3698] },
-            { nombre: "Puerto de Vancouver", coords: [49.2827, -123.1207] },
-            { nombre: "Puerto de Melbourne", coords: [-37.8136, 144.9631] },
-            { nombre: "Puerto de Génova", coords: [44.4056, 8.9463] },
-            { nombre: "Puerto de Tánger Med", coords: [35.8844, -5.5100] },
-            { nombre: "Puerto de Le Havre", coords: [49.4939, 0.1077] },
-            { nombre: "Puerto de Buenos Aires", coords: [-34.6037, -58.3816] },
-            { nombre: "Puerto de Manila", coords: [14.5995, 120.9842] },
-            { nombre: "Puerto de Durban", coords: [-29.8587, 31.0218] },
-            { nombre: "Puerto de Houston", coords: [29.7525, -95.3923] },
-            { nombre: "Puerto de San Antonio", coords: [-33.5933, -71.6216] },
-            { nombre: "Puerto de Lázaro Cárdenas", coords: [17.9583, -102.1944] },
-            { nombre: "Puerto de Callao", coords: [-12.0433, -77.0283] },
-            { nombre: "Puerto de Montevideo", coords: [-34.8836, -56.1819] },
-            { nombre: "Puerto de Balboa", coords: [8.9524, -79.5666] },
-            { nombre: "Puerto de Guayaquil", coords: [-2.1700, -79.9224] },
-            { nombre: "Puerto de Kingston", coords: [17.9714, -76.7920] },
-            { nombre: "Puerto de Salalah", coords: [16.9391, 54.0036] },
-            { nombre: "Puerto de Felixstowe", coords: [51.9634, 1.3515] },
-            { nombre: "Puerto de Gioia Tauro", coords: [38.4210, 15.8970] },
-            { nombre: "Puerto de Port Klang", coords: [3.0020, 101.4000] },
-            { nombre: "Puerto de Chittagong", coords: [22.3308, 91.8123] },
-            { nombre: "Puerto de Ho Chi Minh", coords: [10.7769, 106.7009] },
-            { nombre: "Puerto de Laem Chabang", coords: [13.0850, 100.8900] },
-            { nombre: "Puerto de Cartagena", coords: [10.3997, -75.5144] },
-            { nombre: "Puerto de Buenaventura", coords: [3.8801, -77.0312] },
-            { nombre: "Puerto de Santa Marta", coords: [11.2419, -74.2053] },
-            { nombre: "Puerto de Barranquilla", coords: [10.9685, -74.7813] }
+            // Asia
+            { name: "Puerto de Shanghái", coords: [31.2304, 121.4737] },
+            { name: "Puerto de Singapur", coords: [1.3521, 103.8198] },
+            { name: "Puerto de Busan", coords: [35.1796, 129.0756] },
+            { name: "Puerto de Guangzhou", coords: [23.1291, 113.2644] },
+            { name: "Puerto de Ningbo-Zhoushan", coords: [29.8683, 121.5440] },
+            { name: "Puerto de Qingdao", coords: [36.0671, 120.3826] },
+            { name: "Puerto de Tianjin", coords: [39.3434, 117.3616] },
+            { name: "Puerto de Klang", coords: [3.0333, 101.45] },
+
+            // Europa
+            { name: "Puerto de Róterdam", coords: [51.9225, 4.4792] },
+            { name: "Puerto de Hamburgo", coords: [53.5511, 9.9937] },
+            { name: "Puerto de Amberes", coords: [51.2194, 4.4025] },
+            { name: "Puerto de Valencia", coords: [39.4667, -0.375] },
+            { name: "Puerto de Tánger Med", coords: [35.89, -5.5] },
+            { name: "Puerto de Felixstowe", coords: [51.963, 1.351] },
+            { name: "Puerto de Le Havre", coords: [49.4944, 0.1079] },
+            { name: "Puerto de Génova", coords: [44.4056, 8.9463] },
+
+            // América del Norte y Sur
+            { name: "Puerto de Los Ángeles", coords: [33.7405, -118.2724] },
+            { name: "Puerto de Nueva York y Nueva Jersey", coords: [40.6689, -74.0451] },
+            { name: "Puerto de Savannah", coords: [32.0809, -81.0912] },
+            { name: "Puerto de Vancouver", coords: [49.2827, -123.1207] },
+            { name: "Puerto de Santos", coords: [-23.954, -46.3336] },
+
+            // Medio Oriente
+            { name: "Puerto de Dubái (Jebel Ali)", coords: [25.0107, 55.0610] },
+
+            // Colombia
+            { name: "Puerto de Cartagena", coords: [10.4000, -75.5167] },
+            { name: "Puerto de Buenaventura", coords: [3.8801, -77.0312] },
+            { name: "Puerto de Santa Marta", coords: [11.2419, -74.2052] },
+            { name: "Puerto de Barranquilla", coords: [10.9639, -74.7964] }
         ];
-        
+
         ports.forEach(port => {
             L.marker(port.coords).addTo(map).bindPopup(port.name);
         });
