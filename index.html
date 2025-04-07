@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shiptrack - Rastreo de Cargas</title>
+    <title>Shiptrack - Cargo Tracking</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -46,6 +46,20 @@
             width: 90%;
             height: 500px;
         }
+        .info-table {
+            width: 90%;
+            margin: 20px auto;
+            background-color: white;
+            border-collapse: collapse;
+        }
+        .info-table th, .info-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        .info-table th {
+            background-color: #003366;
+            color: white;
+        }
         footer {
             text-align: center;
             padding: 10px;
@@ -62,19 +76,30 @@
 <body>
 
     <header>
-        <h1>Shiptrack - Rastreo de Cargas</h1>
+        <h1>Shiptrack - Cargo Tracking</h1>
     </header>
 
     <div class="container">
-        <h2>Consulta tu Bill of Lading</h2>
-        <input type="text" id="blNumber" placeholder="Ingresa tu número de Bill of Lading">
-        <button onclick="buscarBL()">Buscar</button>
+        <h2>Enter your Bill of Lading</h2>
+        <input type="text" id="blNumber" placeholder="Enter your Bill of Lading number">
+        <button onclick="buscarBL()">Search</button>
     </div>
 
     <div id="map" class="map-container"></div>
 
+    <table class="info-table">
+        <thead>
+            <tr>
+                <th>Port</th>
+                <th>Estimated Transit Time (days)</th>
+            </tr>
+        </thead>
+        <tbody id="puertoTiempos">
+        </tbody>
+    </table>
+
     <footer>
-        <p>&copy; 2025 Shiptrack | Desarrollado por Juan Giraldo y Dylan Diaz</p>
+        <p>&copy; 2025 Shiptrack | Developed by Juan Giraldo & Dylan Diaz</p>
     </footer>
 
     <script>
@@ -100,7 +125,7 @@
 
                 openNext();
             } else {
-                alert("Por favor, ingresa un número de Bill of Lading.");
+                alert("Please enter a Bill of Lading number.");
             }
         }
 
@@ -111,47 +136,41 @@
         }).addTo(map);
 
         var ports = [
-            // Asia
-            { name: "Puerto de Shanghái", coords: [31.2304, 121.4737] },
-            { name: "Puerto de Singapur", coords: [1.3521, 103.8198] },
-            { name: "Puerto de Busan", coords: [35.1796, 129.0756] },
-            { name: "Puerto de Guangzhou", coords: [23.1291, 113.2644] },
-            { name: "Puerto de Ningbo-Zhoushan", coords: [29.8683, 121.5440] },
-            { name: "Puerto de Qingdao", coords: [36.0671, 120.3826] },
-            { name: "Puerto de Tianjin", coords: [39.3434, 117.3616] },
-            { name: "Puerto de Klang", coords: [3.0333, 101.45] },
-
-            // Europa
-            { name: "Puerto de Róterdam", coords: [51.9225, 4.4792] },
-            { name: "Puerto de Hamburgo", coords: [53.5511, 9.9937] },
-            { name: "Puerto de Amberes", coords: [51.2194, 4.4025] },
-            { name: "Puerto de Valencia", coords: [39.4667, -0.375] },
-            { name: "Puerto de Tánger Med", coords: [35.89, -5.5] },
-            { name: "Puerto de Felixstowe", coords: [51.963, 1.351] },
-            { name: "Puerto de Le Havre", coords: [49.4944, 0.1079] },
-            { name: "Puerto de Génova", coords: [44.4056, 8.9463] },
-
-            // América del Norte y Sur
-            { name: "Puerto de Los Ángeles", coords: [33.7405, -118.2724] },
-            { name: "Puerto de Nueva York y Nueva Jersey", coords: [40.6689, -74.0451] },
-            { name: "Puerto de Savannah", coords: [32.0809, -81.0912] },
-            { name: "Puerto de Vancouver", coords: [49.2827, -123.1207] },
-            { name: "Puerto de Santos", coords: [-23.954, -46.3336] },
-
-            // Medio Oriente
-            { name: "Puerto de Dubái (Jebel Ali)", coords: [25.0107, 55.0610] },
-
-            // Colombia
-            { name: "Puerto de Cartagena", coords: [10.4000, -75.5167] },
-            { name: "Puerto de Buenaventura", coords: [3.8801, -77.0312] },
-            { name: "Puerto de Santa Marta", coords: [11.2419, -74.2052] },
-            { name: "Puerto de Barranquilla", coords: [10.9639, -74.7964] }
+            { name: "Port of Shanghai", coords: [31.2304, 121.4737], tiempo: 25 },
+            { name: "Port of Singapore", coords: [1.3521, 103.8198], tiempo: 20 },
+            { name: "Port of Busan", coords: [35.1796, 129.0756], tiempo: 22 },
+            { name: "Port of Guangzhou", coords: [23.1291, 113.2644], tiempo: 23 },
+            { name: "Port of Ningbo-Zhoushan", coords: [29.8683, 121.5440], tiempo: 24 },
+            { name: "Port of Qingdao", coords: [36.0671, 120.3826], tiempo: 26 },
+            { name: "Port of Tianjin", coords: [39.3434, 117.3616], tiempo: 27 },
+            { name: "Port Klang", coords: [3.0333, 101.45], tiempo: 19 },
+            { name: "Port of Rotterdam", coords: [51.9225, 4.4792], tiempo: 15 },
+            { name: "Port of Hamburg", coords: [53.5511, 9.9937], tiempo: 16 },
+            { name: "Port of Antwerp", coords: [51.2194, 4.4025], tiempo: 15 },
+            { name: "Port of Valencia", coords: [39.4667, -0.375], tiempo: 12 },
+            { name: "Port of Tangier Med", coords: [35.89, -5.5], tiempo: 11 },
+            { name: "Port of Felixstowe", coords: [51.963, 1.351], tiempo: 14 },
+            { name: "Port of Le Havre", coords: [49.4944, 0.1079], tiempo: 13 },
+            { name: "Port of Genoa", coords: [44.4056, 8.9463], tiempo: 14 },
+            { name: "Port of Los Angeles", coords: [33.7405, -118.2724], tiempo: 10 },
+            { name: "Port of New York and New Jersey", coords: [40.6689, -74.0451], tiempo: 9 },
+            { name: "Port of Savannah", coords: [32.0809, -81.0912], tiempo: 8 },
+            { name: "Port of Vancouver", coords: [49.2827, -123.1207], tiempo: 12 },
+            { name: "Port of Santos", coords: [-23.954, -46.3336], tiempo: 14 },
+            { name: "Port of Dubai (Jebel Ali)", coords: [25.0107, 55.0610], tiempo: 18 },
+            { name: "Port of Cartagena", coords: [10.4000, -75.5167], tiempo: 6 },
+            { name: "Port of Buenaventura", coords: [3.8801, -77.0312], tiempo: 7 },
+            { name: "Port of Santa Marta", coords: [11.2419, -74.2052], tiempo: 6 },
+            { name: "Port of Barranquilla", coords: [10.9639, -74.7964], tiempo: 6 }
         ];
 
         ports.forEach(port => {
             L.marker(port.coords).addTo(map).bindPopup(port.name);
+            const row = `<tr><td>${port.name}</td><td>${port.tiempo}</td></tr>`;
+            document.getElementById("puertoTiempos").innerHTML += row;
         });
     </script>
 
 </body>
 </html>
+
