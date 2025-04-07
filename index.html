@@ -165,7 +165,7 @@
         ];
 
         ports.forEach(port => {
-            L.marker(port.coords).addTo(map).bindPopup(port.name);
+            L.marker(port.coords).addTo(map).bindPopup(`<strong>${port.name}</strong><br>Transit Time: ${port.tiempo} days`);
             const row = `<tr><td>${port.name}</td><td>${port.tiempo}</td></tr>`;
             document.getElementById("puertoTiempos").innerHTML += row;
         });
@@ -173,4 +173,3 @@
 
 </body>
 </html>
-
