@@ -124,9 +124,35 @@
                 };
 
                 openNext();
+                mostrarDatosSimulados(); // Aquí llamamos la función nueva
+
             } else {
                 alert("Please enter a Bill of Lading number.");
             }
+        }
+
+        function mostrarDatosSimulados() {
+            const datosSimulados = [
+                { name: "Port of Shanghai", coords: [31.2304, 121.4737], tiempo: 25 },
+                { name: "Port of Cartagena", coords: [10.4000, -75.5167], tiempo: 6 },
+                { name: "Port of Rotterdam", coords: [51.9225, 4.4792], tiempo: 15 }
+            ];
+
+            document.getElementById("puertoTiempos").innerHTML = "";
+
+            map.eachLayer(function(layer) {
+                if (layer instanceof L.Marker) {
+                    map.removeLayer(layer);
+                }
+            });
+
+            datosSimulados.forEach(p => {
+                L.marker(p.coords).addTo(map).bindPopup(`<strong>${p.name}</strong><br>Transit Time: ${p.tiempo} days`);
+                const row = `<tr><td>${p.name}</td><td>${p.tiempo}</td></tr>`;
+                document.getElementById("puertoTiempos").innerHTML += row;
+            });
+
+            map.setView(datosSimulados[0].coords, 4);
         }
 
         var map = L.map('map').setView([20, 0], 2);
