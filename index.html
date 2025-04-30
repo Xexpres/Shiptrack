@@ -6,66 +6,109 @@
 <link rel="hoja de estilo" href=" https://unpkg.com/leaflet@1.9.3/dist/leaflet.css " />
 <estilo>
 cuerpo {
-familia de fuentes: Arial, sans-serif;
 margen: 0;
-relleno: 0;
+familia de fuentes: Arial, sans-serif;
+color de fondo: #f9f9f9;
 }
 
-#mapa {
-altura: 400px;
-}
-
-#información {
+.contenedor {
+ancho: 90%;
+ancho máximo: 1000px;
+margen:auto;
 relleno: 20px;
 }
 
-mesa {
-ancho: 100%;
-colapso de frontera: colapso;
-margen superior: 15px;
+.encabezado {
+pantalla:flexible;
+alinear-elementos: centro;
+justificar-contenido: espacio-entre;
 }
 
-el, td {
-borde: 1px sólido #ccc;
-relleno: 8px;
+.encabezado img {
+altura: 50px;
 }
 
-el {
-color de fondo: #f2f2f2;
+h1 {
+alinear texto: centro;
+margen superior: 10px;
+}
+
+.sección de búsqueda {
+margen: 20px 0;
+alinear texto: centro;
 }
 
 entrada[tipo="texto"] {
 relleno: 8px;
 ancho: 300px;
+margen derecho: 10px;
 }
 
 botón {
 relleno: 8px 15px;
+color de fondo: #007bff;
+color: blanco;
+borde: ninguno;
 cursor: puntero;
+radio del borde: 4px;
+}
+
+botón:hover {
+color de fondo: #0056b3;
+}
+
+mesa {
+ancho: 100%;
+colapso de frontera: colapso;
+margen superior: 20px;
+color de fondo: blanco;
+}
+
+el, td {
+borde: 1px sólido #ccc;
+relleno: 10px;
+alinear texto: izquierda;
+}
+
+el {
+color de fondo: #007bff;
+color: blanco;
+}
+
+#mapa {
+altura: 400px;
+margen superior: 30px;
+borde: 2px sólido #ccc;
 }
 </estilo>
 </cabeza>
 <cuerpo>
 
-<div id="información">
-<h2>Seguimiento de Contenedor</h2>
+<div class="contenedor">
+<div class="header">
+<img src=" https://upload.wikimedia.org/wikipedia/commons/7/79/Logo_MSC.svg " alt="Logotipo MSC">
+</div>
+
+<h1>Seguimiento de Contenedor</h1>
+
+<div class="sección-de-búsqueda">
 <label for="blNumber">Número de BL:</label>
 <input type="text" id="blNumber" placeholder="Ej: MEDUQT871264">
 <button onclick="mostrarDatosSimulados()">Buscar</button>
+</div>
 
-<table id="tablaEventos">
+<tabla>
 <cabeza>
 <tr>
-Puerto y Eventos
+Puerto y Evento
 Fecha
 </tr>
 </cabeza>
-<tbody id="puertoTiempos">
-</tbody>
+<tbody id="puertoTiempos"></tbody>
 </tabla>
-</div>
 
 <div id="mapa"></div>
+</div>
 
 <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js "></script>
 <guión>
@@ -74,51 +117,56 @@ L.tileLayer('https://{s} .tile.openstreetmap.org/ {z}/{x}/{y}.png ', {
 atribución: '&copy; colaboradores de OpenStreetMap'
 }).addTo(mapa);
 
+deje rutaPolyline;
+deje que los marcadores = [];
+
 function mostrarDatosSimulados() {
 const bl = document.getElementById("blNumber").value.trim();
+const tbody = document.getElementById("puertoTiempos");
+tbody.innerHTML = "";
+
+// Limpia marcadores anteriores
+marcadores.forEach(m => map.removeLayer(m));
+marcadores = [];
+
+si (rutaPolilinea) {
+mapa.removeLayer(rutaPolyline);
+}
 
 si (bl === "MEDUQT871264") {
-const datosRuta = [
-{ puerto: "Qingdao, CN", evento: "Empty to Shipper", fecha: "10 Feb 2025 00:00", coords: [36.0671, 120.3826] },
-{ puerto: "Qingdao, CN", evento: "Exportación recibida en CY", fecha: "16 Feb 2025 00:00", coords: [36.0671, 120.3826] },
-{ puerto: "Qingdao, CN", evento: "Export Loaded on Vessel", fecha: "17 Feb 2025 00:00", coords: [36.0671, 120.3826] },
-{ puerto: "Busan, KR", evento: "Full Transshipment Discharged", fecha: "22 Feb 2025 00:00", coords: [35.1796, 129.0756] },
-{ puerto: "Busan, KR", evento: "Transbordo completo", fecha: "23 feb 2025 00:00", coordenadas: [35.1796, 129.0756] },
-{ puerto: "Buenaventura, CO", evento: "Importación Descargada de Buque", fecha: "25 Mar 2025 00:00", coords: [3.8801, -77.0312] },
-{ puerto: "Buenaventura, CO", evento: "Importar a consignatario", fecha: "4 Abr 2025 00:00", coords: [3.8801, -77.0312] },
-{ puerto: "Buenaventura, CO", evento: "Vacío recibido en CY", fecha: "7 Abr 2025 00:00", coords: [3.8801, -77.0312] },
+const datos = [
+{ puerto: "Qingdao, CN", evento: "Empty to Shipper", fecha: "10 Feb 2025", coords: [36.0671, 120.3826] },
+{ puerto: "Qingdao, CN", evento: "Exportación recibida en CY", fecha: "16 Feb 2025", coords: [36.0671, 120.3826] },
+{ puerto: "Qingdao, CN", evento: "Export Loaded on Vessel", fecha: "17 Feb 2025", coords: [36.0671, 120.3826] },
+{ puerto: "Busan, KR", evento: "Full Transshipment Discharged", fecha: "22 Feb 2025", coords: [35.1796, 129.0756] },
+{ puerto: "Busan, KR", evento: "Transbordo completo cargado", fecha: "23 Feb 2025", coordenadas: [35.1796, 129.0756] },
+{ puerto: "Buenaventura, CO", evento: "Importación Descargada de Buque", fecha: "25 Mar 2025", coords: [3.8801, -77.0312] },
+{ puerto: "Buenaventura, CO", evento: "Importar a Consignatario", fecha: "4 Abr 2025", coords: [3.8801, -77.0312] },
+{ puerto: "Buenaventura, CO", evento: "Vacío recibido en CY", fecha: "7 Abr 2025", coords: [3.8801, -77.0312] }
 ];
 
-document.getElementById("puertoTiempos").innerHTML = "";
+const coordenadasRuta = [];
 
-mapa.eachLayer(capa => {
-si (capa instancia de L.Marcador || capa instancia de L.Polilínea) {
-mapa.removeLayer(capa);
-}
+datos.forEach(item => {
+const fila = document.createElement("tr");
+fila.innerHTML = `<td>${item.puerto} - ${item.evento}</td><td>${item.fecha}</td>`;
+tbody.appendChild(fila);
+
+const marcador = L.marker(item.coords).addTo(mapa)
+.bindPopup(`<strong>${item.puerto}</strong><br>${item.evento}<br>${item.fecha}`);
+marcadores.push(marcador);
+
+coordenadasRuta.push(item.coords);
 });
 
-L.tileLayer('https://{s} .tile.openstreetmap.org/ {z}/{x}/{y}.png ', {
-atribución: '&copy; colaboradores de OpenStreetMap'
-}).addTo(mapa);
+rutaPolyline = L.polyline(coordenadasRuta, { color: 'azul' }).addTo(mapa);
+mapa.fitBounds(rutaPolyline.getBounds());
 
-sea rutaCoordenadas = [];
-
-datosRuta.forEach(dato => {
-L.marcador(dato.coords).addTo(mapa)
-.bindPopup(`<strong>${dato.puerto}</strong><br>${dato.evento}<br>${dato.fecha}`);
-const fila = `<tr><td>${dato.puerto} - ${dato.evento}</td><td>${dato.fecha}</td></tr>`;
-document.getElementById("puertoTiempos").innerHTML += fila;
-rutaCoordenadas.push(dato.coords);
-});
-
-L.polyline(rutaCoordenadas, { color: 'azul' }).addTo(mapa);
-mapa.setView(rutaCoordenadas[0], 3);
 } demás {
-alert("No hay datos disponibles para este BL.");
+alert("No se encontraron datos para este BL.");
 }
 }
 </script>
 
 </cuerpo>
 </html>
-
