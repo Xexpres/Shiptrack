@@ -1,172 +1,213 @@
 <!DOCTYPE html>
 <html lang="es">
-<cabeza>
-<meta charset="UTF-8">
-<title>Seguimiento de Contenedor</title>
-<link rel="hoja de estilo" href=" https://unpkg.com/leaflet@1.9.3/dist/leaflet.css " />
-<estilo>
-cuerpo {
-margen: 0;
-familia de fuentes: Arial, sans-serif;
-color de fondo: #f9f9f9;
-}
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shiptrack - Seguimiento de carga</title>
 
-.contenedor {
-ancho: 90%;
-ancho máximo: 1000px;
-margen:auto;
-relleno: 20px;
-}
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+      text-align: center;
+    }
 
-.encabezado {
-pantalla:flexible;
-alinear-elementos: centro;
-justificar-contenido: espacio-entre;
-}
+    header {
+      background-color: #003366;
+      color: white;
+      padding: 15px;
+    }
 
-.encabezado img {
-altura: 50px;
-}
+    .contenedor {
+      max-width: 600px;
+      margin: 20px auto;
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
 
-h1 {
-alinear texto: centro;
-margen superior: 10px;
-}
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
 
-.sección de búsqueda {
-margen: 20px 0;
-alinear texto: centro;
-}
+    button {
+      background-color: #003366;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
 
-entrada[tipo="texto"] {
-relleno: 8px;
-ancho: 300px;
-margen derecho: 10px;
-}
+    button:hover {
+      background-color: #002244;
+    }
 
-botón {
-relleno: 8px 15px;
-color de fondo: #007bff;
-color: blanco;
-borde: ninguno;
-cursor: puntero;
-radio del borde: 4px;
-}
+    .contenedor-de-mapas {
+      margin: 20px auto;
+      width: 90%;
+      height: 500px;
+    }
 
-botón:hover {
-color de fondo: #0056b3;
-}
+    .tabla-de-informacion {
+      width: 90%;
+      margin: 20px auto;
+      background-color: white;
+      border-collapse: collapse;
+    }
 
-mesa {
-ancho: 100%;
-colapso de frontera: colapso;
-margen superior: 20px;
-color de fondo: blanco;
-}
+    .tabla-de-informacion th, .tabla-de-informacion td {
+      border: 1px solid #ddd;
+      padding: 8px;
+    }
 
-el, td {
-borde: 1px sólido #ccc;
-relleno: 10px;
-alinear texto: izquierda;
-}
+    .tabla-de-informacion th {
+      background-color: #003366;
+      color: white;
+    }
 
-el {
-color de fondo: #007bff;
-color: blanco;
-}
+    footer {
+      text-align: center;
+      padding: 10px;
+      background-color: #003366;
+      color: white;
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+    }
+  </style>
 
-#mapa {
-altura: 400px;
-margen superior: 30px;
-borde: 2px sólido #ccc;
-}
-</estilo>
-</cabeza>
-<cuerpo>
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+</head>
 
-<div class="contenedor">
-<div class="header">
-<img src=" https://upload.wikimedia.org/wikipedia/commons/7/79/Logo_MSC.svg " alt="Logotipo MSC">
-</div>
+<body>
 
-<h1>Seguimiento de Contenedor</h1>
+  <header>
+    Shiptrack - Seguimiento de carga
+  </header>
 
-<div class="sección-de-búsqueda">
-<label for="blNumber">Número de BL:</label>
-<input type="text" id="blNumber" placeholder="Ej: MEDUQT871264">
-<button onclick="mostrarDatosSimulados()">Buscar</button>
-</div>
+  <div class="contenedor">
+    <p>Ingrese su conocimiento de embarque</p>
+    <input type="text" id="blNumber" placeholder="Ingrese su número de conocimiento de embarque">
+    <button onclick="buscarBL()">Buscar</button>
+  </div>
 
-<tabla>
-<cabeza>
-<tr>
-Puerto y Evento
-Fecha
-</tr>
-</cabeza>
-<tbody id="puertoTiempos"></tbody>
-</tabla>
+  <div id="mapa" class="contenedor-de-mapas"></div>
 
-<div id="mapa"></div>
-</div>
+  <table class="tabla-de-informacion">
+    <thead>
+      <tr>
+        <th>Puerto</th>
+        <th>Tiempo de tránsito estimado (días)</th>
+      </tr>
+    </thead>
+    <tbody id="puertoTiempos">
+    </tbody>
+  </table>
 
-<script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js "></script>
-<guión>
-constante map = L.map('mapa').setView([20, 0], 2);
-L.tileLayer('https://{s} .tile.openstreetmap.org/ {z}/{x}/{y}.png ', {
-atribución: '&copy; colaboradores de OpenStreetMap'
-}).addTo(mapa);
+  <footer>
+    <p>&copy; 2025 Shiptrack | Desarrollado por Juan Giraldo y Dylan Díaz</p>
+  </footer>
 
-deje rutaPolyline;
-deje que los marcadores = [];
+  <script>
+    function buscarBL() {
+      var bl = document.getElementById("blNumber").value.trim();
+      if (bl) {
+        const trackingSites = [
+          `https://www.msc.com/en/track-a-shipment?bl=${bl}`,
+          `https://www.one-line.com/en/standard-page/track-trace?bl=${bl}`,
+          `https://www.maersk.com/tracking/${bl}`,
+          `https://www.hapag-lloyd.com/es/online-business/track/track-by-booking.html?bl=${bl}`,
+          `https://www.evergreen-line.com/ticket/Tracking?bl=${bl}`
+        ];
 
-function mostrarDatosSimulados() {
-const bl = document.getElementById("blNumber").value.trim();
-const tbody = document.getElementById("puertoTiempos");
-tbody.innerHTML = "";
+        let index = 0;
+        const openNext = () => {
+          if (index < trackingSites.length) {
+            window.open(trackingSites[index], '_blank');
+            index++;
+            setTimeout(openNext, 300);
+          }
+        };
 
-// Limpia marcadores anteriores
-marcadores.forEach(m => map.removeLayer(m));
-marcadores = [];
+        openNext();
+        mostrarDatosSimulados();
+      } else {
+        alert("Por favor ingrese un número de conocimiento de embarque.");
+      }
+    }
 
-si (rutaPolilinea) {
-mapa.removeLayer(rutaPolyline);
-}
+    function mostrarDatosSimulados() {
+      const datosSimulados = [
+        { name: "Puerto de Shanghai", coords: [31.2304, 121.4737], tiempo: 25 },
+        { name: "Puerto de Cartagena", coords: [10.4000, -75.5167], tiempo: 6 },
+        { name: "Puerto de Rotterdam", coords: [51.9225, 4.4792], tiempo: 15 }
+      ];
 
-si (bl === "MEDUQT871264") {
-const datos = [
-{ puerto: "Qingdao, CN", evento: "Empty to Shipper", fecha: "10 Feb 2025", coords: [36.0671, 120.3826] },
-{ puerto: "Qingdao, CN", evento: "Exportación recibida en CY", fecha: "16 Feb 2025", coords: [36.0671, 120.3826] },
-{ puerto: "Qingdao, CN", evento: "Export Loaded on Vessel", fecha: "17 Feb 2025", coords: [36.0671, 120.3826] },
-{ puerto: "Busan, KR", evento: "Full Transshipment Discharged", fecha: "22 Feb 2025", coords: [35.1796, 129.0756] },
-{ puerto: "Busan, KR", evento: "Transbordo completo cargado", fecha: "23 Feb 2025", coordenadas: [35.1796, 129.0756] },
-{ puerto: "Buenaventura, CO", evento: "Importación Descargada de Buque", fecha: "25 Mar 2025", coords: [3.8801, -77.0312] },
-{ puerto: "Buenaventura, CO", evento: "Importar a Consignatario", fecha: "4 Abr 2025", coords: [3.8801, -77.0312] },
-{ puerto: "Buenaventura, CO", evento: "Vacío recibido en CY", fecha: "7 Abr 2025", coords: [3.8801, -77.0312] }
-];
+      document.getElementById("puertoTiempos").innerHTML = "";
 
-const coordenadasRuta = [];
+      map.eachLayer(function (layer) {
+        if (layer instanceof L.Marker) {
+          map.removeLayer(layer);
+        }
+      });
 
-datos.forEach(item => {
-const fila = document.createElement("tr");
-fila.innerHTML = `<td>${item.puerto} - ${item.evento}</td><td>${item.fecha}</td>`;
-tbody.appendChild(fila);
+      datosSimulados.forEach(p => {
+        L.marker(p.coords).addTo(map).bindPopup(`<strong>${p.name}</strong><br>Tiempo de tránsito: ${p.tiempo} días`);
+        const row = `<tr><td>${p.name}</td><td>${p.tiempo}</td></tr>`;
+        document.getElementById("puertoTiempos").innerHTML += row;
+      });
 
-const marcador = L.marker(item.coords).addTo(mapa)
-.bindPopup(`<strong>${item.puerto}</strong><br>${item.evento}<br>${item.fecha}`);
-marcadores.push(marcador);
+      map.setView(datosSimulados[0].coords, 4);
+    }
 
-coordenadasRuta.push(item.coords);
-});
+    var map = L.map('mapa').setView([20, 0], 2);
 
-rutaPolyline = L.polyline(coordenadasRuta, { color: 'azul' }).addTo(mapa);
-mapa.fitBounds(rutaPolyline.getBounds());
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; colaboradores de OpenStreetMap'
+    }).addTo(map);
 
-} demás {
-alert("No se encontraron datos para este BL.");
-}
-}
-</script>
+    var puertos = [
+      { name: "Puerto de Shanghai", coords: [31.2304, 121.4737], tiempo: 25 },
+      { name: "Puerto de Singapur", coords: [1.3521, 103.8198], tiempo: 20 },
+      { name: "Puerto de Busan", coords: [35.1796, 129.0756], tiempo: 22 },
+      { name: "Puerto de Guangzhou", coords: [23.1291, 113.2644], tiempo: 23 },
+      { name: "Puerto de Ningbo-Zhoushan", coords: [29.8683, 121.5440], tiempo: 24 },
+      { name: "Puerto de Qingdao", coords: [36.0671, 120.3826], tiempo: 26 },
+      { name: "Puerto de Tianjin", coords: [39.3434, 117.3616], tiempo: 27 },
+      { name: "Port Klang", coords: [3.0333, 101.45], tiempo: 19 },
+      { name: "Puerto de Rotterdam", coords: [51.9225, 4.4792], tiempo: 15 },
+      { name: "Puerto de Hamburgo", coords: [53.5511, 9.9937], tiempo: 16 },
+      { name: "Puerto de Amberes", coords: [51.2194, 4.4025], tiempo: 15 },
+      { name: "Puerto de Valencia", coords: [39.4667, -0.375], tiempo: 12 },
+      { name: "Puerto de Tánger Med", coords: [35.89, -5.5], tiempo: 11 },
+      { name: "Puerto de Felixstowe", coords: [51.963, 1.351], tiempo: 14 },
+      { name: "Puerto de Le Havre", coords: [49.4944, 0.1079], tiempo: 13 },
+      { name: "Puerto de Génova", coords: [44.4056, 8.9463], tiempo: 14 },
+      { name: "Puerto de Los Ángeles", coords: [33.7405, -118.2724], tiempo: 10 },
+      { name: "Puerto de Nueva York y Nueva Jersey", coords: [40.6689, -74.0451], tiempo: 9 },
+      { name: "Puerto de Savannah", coords: [32.0809, -81.0912], tiempo: 8 },
+      { name: "Puerto de Vancouver", coords: [49.2827, -123.1207], tiempo: 12 },
+      { name: "Puerto de Santos", coords: [-23.954, -46.3336], tiempo: 14 },
+      { name: "Puerto de Dubai (Jebel Ali)", coords: [25.0107, 55.0610], tiempo: 18 },
+      { name: "Puerto de Cartagena", coords: [10.4000, -75.5167], tiempo: 6 },
+      { name: "Puerto de Buenaventura", coords: [3.8801, -77.0312], tiempo: 7 },
+      { name: "Puerto de Santa Marta", coords: [11.2419, -74.2052], tiempo: 6 },
+      { name: "Puerto de Barranquilla", coords: [10.9639, -74.7964], tiempo: 6 }
+    ];
 
-</cuerpo>
+    puertos.forEach(port => {
+      L.marker(port.coords).addTo(map).bindPopup(`<strong>${port.name}</strong><br>Tiempo de tránsito: ${port.tiempo} días`);
+      const row = `<tr><td>${port.name}</td><td>${port.tiempo}</td></tr>`;
+      document.getElementById("puertoTiempos").innerHTML += row;
+    });
+  </script>
+
+</body>
 </html>
