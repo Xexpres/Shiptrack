@@ -1,191 +1,124 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Shiptrack - Seguimiento de carga</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: #f4f4f4;
-      text-align: center;
-    }
-    header {
-      background-color: #003366;
-      color: white;
-      padding: 15px;
-    }
-    .container {
-      max-width: 600px;
-      margin: 20px auto;
-      background-color: white;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
-    input, button {
-      width: 100%;
-      padding: 10px;
-      margin: 10px 0;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-    }
-    button {
-      background-color: #003366;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #002244;
-    }
-    .map-container {
-      margin: 20px auto;
-      width: 90%;
-      height: 500px;
-    }
-    table {
-      width: 90%;
-      margin: 20px auto;
-      background-color: white;
-      border-collapse: collapse;
-    }
-    .info-table th, .info-table td {
-      border: 1px solid #ddd;
-      padding: 8px;
-    }
-    .info-table th {
-      background-color: #003366;
-      color: white;
-    }
-    footer {
-      text-align: center;
-      padding: 10px;
-      background-color: #003366;
-      color: white;
-      position: fixed;
-      bottom: 0;
-      width: 100%;
-    }
-  </style>
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-</head>
-<body>
+<cabeza>
+<meta charset="UTF-8">
+<title>Seguimiento de Contenedor</title>
+<link rel="hoja de estilo" href=" https://unpkg.com/leaflet@1.9.3/dist/leaflet.css " />
+<estilo>
+cuerpo {
+familia de fuentes: Arial, sans-serif;
+margen: 0;
+relleno: 0;
+}
 
-  <header>
-    Shiptrack - Seguimiento de carga
-  </header>
+#mapa {
+altura: 400px;
+}
 
-  <div class="container">
-    <label for="blNumber">Ingrese su conocimiento de embarque</label>
-    <input type="text" id="blNumber" placeholder="Ingrese su número de conocimiento de embarque">
-    <button onclick="buscarBL()">Buscar</button>
-  </div>
+#información {
+relleno: 20px;
+}
 
-  <div id="map" class="map-container"></div>
+mesa {
+ancho: 100%;
+colapso de frontera: colapso;
+margen superior: 15px;
+}
 
-  <table class="info-table">
-    <thead>
-      <tr>
-        <th>Puerto</th>
-        <th>Tiempo de tránsito estimado (días)</th>
-        <th>Distancia estimada (km)</th>
-        <th>Última actualización</th>
-      </tr>
-    </thead>
-    <tbody id="puertoTiempos">
-      <!-- Los datos de los puertos serán insertados aquí -->
-    </tbody>
-  </table>
+el, td {
+borde: 1px sólido #ccc;
+relleno: 8px;
+}
 
-  <footer>
-    <p>&copy; 2025 Shiptrack | Desarrollado por Juan Giraldo y Dylan Díaz</p>
-  </footer>
+el {
+color de fondo: #f2f2f2;
+}
 
-  <script>
-    function buscarBL() {
-      var bl = document.getElementById("blNumber").value.trim();
-      if (bl) {
-        const trackingSites = [
-          `https://www.msc.com/en/track-a-shipment?bl=${bl}`,
-          `https://www.one-line.com/en/standard-page/track-trace?bl=${bl}`,
-          `https://www.maersk.com/tracking/${bl}`,
-          `https://www.hapag-lloyd.com/es/online-business/track/track-by-booking.html?bl=${bl}`,
-          `https://www.evergreen-line.com/ticket/Tracking?bl=${bl}`
-        ];
+entrada[tipo="texto"] {
+relleno: 8px;
+ancho: 300px;
+}
 
-        let index = 0;
-        const openNext = () => {
-          if (index < trackingSites.length) {
-            window.open(trackingSites[index], '_blank');
-            index++;
-            setTimeout(openNext, 300);
-          }
-        };
-        openNext();
-        mostrarDatosSimulados(); // Llamamos la función que muestra los datos de los puertos
-      } else {
-        alert("Por favor ingrese un número de conocimiento de embarque.");
-      }
-    }
+botón {
+relleno: 8px 15px;
+cursor: puntero;
+}
+</estilo>
+</cabeza>
+<cuerpo>
 
-    function mostrarDatosSimulados() {
-      const datosSimulados = [
-        { nombre: "Puerto de Shanghai", coords: [31.2304, 121.4737], tiempo: 25, distancia: 12000, ultimaActualizacion: "2025-04-25" },
-        { nombre: "Puerto de Singapur", coords: [1.3521, 103.8198], tiempo: 20, distancia: 11000, ultimaActualizacion: "2025-04-28" },
-        { nombre: "Puerto de Busan", coords: [35.1796, 129.0756], tiempo: 22, distancia: 9000, ultimaActualizacion: "2025-04-26" },
-        { nombre: "Puerto de Guangzhou", coords: [23.1291, 113.2644], tiempo: 23, distancia: 9500, ultimaActualizacion: "2025-04-26" },
-        { nombre: "Puerto de Ningbo-Zhoushan", coords: [29.8683, 121.5440], tiempo: 24, distancia: 10000, ultimaActualizacion: "2025-04-26" },
-        { nombre: "Puerto de Qingdao", coords: [36.0671, 120.3826], tiempo: 26, distancia: 10500, ultimaActualizacion: "2025-04-25" },
-        { nombre: "Puerto de Tianjin", coords: [39.3434, 117.3616], tiempo: 27, distancia: 11000, ultimaActualizacion: "2025-04-25" },
-        { nombre: "Port Klang", coords: [3.0333, 101.45], tiempo: 19, distancia: 8000, ultimaActualizacion: "2025-04-26" },
-        { nombre: "Puerto de Rotterdam", coords: [51.9225, 4.4792], tiempo: 15, distancia: 8000, ultimaActualizacion: "2025-04-25" },
-        { nombre: "Puerto de Hamburgo", coords: [53.5511, 9.9937], tiempo: 16, distancia: 8500, ultimaActualizacion: "2025-04-26" },
-        { nombre: "Puerto de Amberes", coords: [51.2194, 4.4025], tiempo: 15, distancia: 8200, ultimaActualizacion: "2025-04-25" },
-        { nombre: "Puerto de Valencia", coords: [39.4667, -0.375], tiempo: 12, distancia: 4500, ultimaActualizacion: "2025-04-26" },
-        { nombre: "Puerto de Tánger Med", coords: [35.89, -5.5], tiempo: 11, distancia: 2500, ultimaActualizacion: "2025-04-27" },
-        { nombre: "Puerto de Felixstowe", coords: [51.963, 1.351], tiempo: 14, distancia: 5500, ultimaActualizacion: "2025-04-27" },
-        { nombre: "Puerto de Le Havre", coords: [49.4944, 0.1079], tiempo: 13, distancia: 4700, ultimaActualizacion: "2025-04-28" },
-        { nombre: "Puerto de Génova", coords: [44.4056, 8.9463], tiempo: 14, distancia: 5100, ultimaActualizacion: "2025-04-28" },
-        { nombre: "Puerto de Los Ángeles", coords: [33.7405, -118.2724], tiempo: 10, distancia: 8000, ultimaActualizacion: "2025-04-26" },
-        { nombre: "Puerto de Nueva York y Nueva Jersey", coords: [40.6689, -74.0451], tiempo: 9, distancia: 7500, ultimaActualizacion: "2025-04-27" },
-        { nombre: "Puerto de Savannah", coords: [32.0809, -81.0912], tiempo: 8, distancia: 6500, ultimaActualizacion: "2025-04-28" },
-        { nombre: "Puerto de Vancouver", coords: [49.2827, -123.1207], tiempo: 12, distancia: 10000, ultimaActualizacion: "2025-04-26" },
-        { nombre: "Puerto de Santos", coords: [-23.954, -46.3336], tiempo: 14, distancia: 8000, ultimaActualizacion: "2025-04-26" },
-        { nombre: "Puerto de Dubai (Jebel Ali)", coords: [25.0107, 55.0610], tiempo: 18, distancia: 12000, ultimaActualizacion: "2025-04-25" },
-        { nombre: "Puerto de Cartagena", coords: [10.4000, -75.5167], tiempo: 6, distancia: 3500, ultimaActualizacion: "2025-04-28" },
-        { nombre: "Puerto de Buenaventura", coords: [3.8801, -77.0312], tiempo: 7, distancia: 3200, ultimaActualizacion: "2025-04-28" },
-        { nombre: "Puerto de Santa Marta", coords: [11.2419, -74.2052], tiempo: 6, distancia: 4000, ultimaActualizacion: "2025-04-26" },
-        { nombre: "Puerto de Barranquilla", coords: [10.9639, -74.7964], tiempo: 6, distancia: 3800, ultimaActualizacion: "2025-04-27" }
-      ];
+<div id="información">
+<h2>Seguimiento de Contenedor</h2>
+<label for="blNumber">Número de BL:</label>
+<input type="text" id="blNumber" placeholder="Ej: MEDUQT871264">
+<button onclick="mostrarDatosSimulados()">Buscar</button>
 
-      document.getElementById("puertoTiempos").innerHTML = "";
+<table id="tablaEventos">
+<cabeza>
+<tr>
+Puerto y Eventos
+Fecha
+</tr>
+</cabeza>
+<tbody id="puertoTiempos">
+</tbody>
+</tabla>
+</div>
 
-      map.eachLayer(function(layer) {
-        if (layer instanceof L.Marker) {
-          map.removeLayer(layer);
-        }
-      });
+<div id="mapa"></div>
 
-      datosSimulados.forEach(p => {
-        L.marker(p.coords).addTo(map).bindPopup(`<strong>${p.nombre}</strong><br>Tiempo de tránsito: ${p.tiempo} días<br>Distancia: ${p.distancia} km<br>Última actualización: ${p.ultimaActualizacion}`);
-        const row = `<tr><td>${p.nombre}</td><td>${p.tiempo}</td><td>${p.distancia}</td><td>${p.ultimaActualizacion}</td></tr>`;
-        document.getElementById("puertoTiempos").innerHTML += row;
-      });
+<script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js "></script>
+<guión>
+constante map = L.map('mapa').setView([20, 0], 2);
+L.tileLayer('https://{s} .tile.openstreetmap.org/ {z}/{x}/{y}.png ', {
+atribución: '&copy; colaboradores de OpenStreetMap'
+}).addTo(mapa);
 
-      map.setView(datosSimulados[0].coords, 4);
-    }
+function mostrarDatosSimulados() {
+const bl = document.getElementById("blNumber").value.trim();
 
-    var map = L.map('map').setView([20, 0], 2);
+si (bl === "MEDUQT871264") {
+const datosRuta = [
+{ puerto: "Qingdao, CN", evento: "Empty to Shipper", fecha: "10 Feb 2025 00:00", coords: [36.0671, 120.3826] },
+{ puerto: "Qingdao, CN", evento: "Exportación recibida en CY", fecha: "16 Feb 2025 00:00", coords: [36.0671, 120.3826] },
+{ puerto: "Qingdao, CN", evento: "Export Loaded on Vessel", fecha: "17 Feb 2025 00:00", coords: [36.0671, 120.3826] },
+{ puerto: "Busan, KR", evento: "Full Transshipment Discharged", fecha: "22 Feb 2025 00:00", coords: [35.1796, 129.0756] },
+{ puerto: "Busan, KR", evento: "Transbordo completo", fecha: "23 feb 2025 00:00", coordenadas: [35.1796, 129.0756] },
+{ puerto: "Buenaventura, CO", evento: "Importación Descargada de Buque", fecha: "25 Mar 2025 00:00", coords: [3.8801, -77.0312] },
+{ puerto: "Buenaventura, CO", evento: "Importar a consignatario", fecha: "4 Abr 2025 00:00", coords: [3.8801, -77.0312] },
+{ puerto: "Buenaventura, CO", evento: "Vacío recibido en CY", fecha: "7 Abr 2025 00:00", coords: [3.8801, -77.0312] },
+];
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenStreetMap contributors'
-    }).addTo(map);
+document.getElementById("puertoTiempos").innerHTML = "";
 
-  </script>
+mapa.eachLayer(capa => {
+si (capa instancia de L.Marcador || capa instancia de L.Polilínea) {
+mapa.removeLayer(capa);
+}
+});
 
-</body>
+L.tileLayer('https://{s} .tile.openstreetmap.org/ {z}/{x}/{y}.png ', {
+atribución: '&copy; colaboradores de OpenStreetMap'
+}).addTo(mapa);
+
+sea rutaCoordenadas = [];
+
+datosRuta.forEach(dato => {
+L.marcador(dato.coords).addTo(mapa)
+.bindPopup(`<strong>${dato.puerto}</strong><br>${dato.evento}<br>${dato.fecha}`);
+const fila = `<tr><td>${dato.puerto} - ${dato.evento}</td><td>${dato.fecha}</td></tr>`;
+document.getElementById("puertoTiempos").innerHTML += fila;
+rutaCoordenadas.push(dato.coords);
+});
+
+L.polyline(rutaCoordenadas, { color: 'azul' }).addTo(mapa);
+mapa.setView(rutaCoordenadas[0], 3);
+} demás {
+alert("No hay datos disponibles para este BL.");
+}
+}
+</script>
+
+</cuerpo>
 </html>
+
