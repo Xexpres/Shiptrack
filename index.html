@@ -17,20 +17,9 @@
       background-color: #003366;
       color: white;
       padding: 15px;
+      font-size: 1.5em;
     }
-    nav {
-      background-color: #005599;
-      display: flex;
-      justify-content: center;
-      padding: 10px;
-    }
-    nav a {
-      color: white;
-      margin: 0 15px;
-      text-decoration: none;
-      font-weight: bold;
-    }
-    .container {
+    .contenedor {
       max-width: 600px;
       margin: 20px auto;
       background-color: white;
@@ -54,7 +43,7 @@
     button:hover {
       background-color: #002244;
     }
-    #map {
+    #mapa {
       margin: 20px auto;
       width: 90%;
       height: 500px;
@@ -86,24 +75,15 @@
 </head>
 <body>
 
-  <header>
-    <h1>Shiptrack - Seguimiento de carga</h1>
-  </header>
+  <header>Shiptrack - Seguimiento de carga</header>
 
-  <nav>
-    <a href="#usuario">Usuario</a>
-    <a href="#contacto">Contacto</a>
-    <a href="#ayuda">Ayuda</a>
-  </nav>
-
-  <div class="container">
-    <h2>Simulador de Búsqueda</h2>
-    <input type="text" id="blNumber" placeholder="Ingrese su número de
-conocimiento de embarque">
+  <div class="contenedor">
+    <label for="blNumber">Ingrese su número de conocimiento de embarque</label>
+    <input type="text" id="blNumber" placeholder="Ej. ABCD123456789">
     <button onclick="buscarBL()">Buscar</button>
   </div>
 
-  <div id="map"></div>
+  <div id="mapa"></div>
 
   <table>
     <thead>
@@ -116,20 +96,24 @@ conocimiento de embarque">
   </table>
 
   <footer>
-    <p>&copy; 2025 Shiptrack | Desarrollado por Juan Giraldo y Dylan Díaz</p>
+    &copy; 2025 Shiptrack | Desarrollado por Juan Giraldo y Dylan Díaz
   </footer>
 
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script>
-    var map = L.map('map').setView([20, 0], 2);
+    const map = L.map('mapa').setView([20, 0], 2);
+
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
 
-    const datosSimulados = [
-      { nombre: "Puerto de Shanghai", coords: [31.2304, 121.4737], tiempo: 25 },
-      { nombre: "Puerto de Cartagena", coords: [10.4000, -75.5167], tiempo: 6 },
-      { nombre: "Puerto de Rotterdam", coords: [51.9225, 4.4792], tiempo: 15 }
+    const puertos = [
+      { name: "Puerto de Shanghai", coords: [31.2304, 121.4737], tiempo: 25 },
+      { name: "Puerto de Cartagena", coords: [10.4000, -75.5167], tiempo: 6 },
+      { name: "Puerto de Rotterdam", coords: [51.9225, 4.4792], tiempo: 15 },
+      { name: "Puerto de Buenaventura", coords: [3.8801, -77.0312], tiempo: 7 },
+      { name: "Puerto de Santa Marta", coords: [11.2419, -74.2052], tiempo: 6 },
+      { name: "Puerto de Barranquilla", coords: [10.9639, -74.7964], tiempo: 6 }
     ];
 
     function buscarBL() {
@@ -139,29 +123,48 @@ conocimiento de embarque">
         return;
       }
 
-      // Guardar búsqueda en localStorage
-      let historico = JSON.parse(localStorage.getItem("busquedas")) || [];
-      historico.push(bl);
-      localStorage.setItem("busquedas", JSON.stringify(historico));
+      const trackingSites = [
+        `https://www.msc.com/en/track-a-shipment?bl=${bl}`,
+        `https://www.one-line.com/en/standard-page/track-trace?bl=${bl}`,
+        `https://www.maersk.com/tracking/${bl}`,
+        `https://www.hapag-lloyd.com/es/online-business/track/track-by-booking.html?bl=${bl}`,
+        `https://www.evergreen-line.com/ticket/Tracking?bl=${bl}`
+      ];
 
-      // Limpiar tabla y mapa
+      let index = 0;
+      const openNext = () => {
+        if (index < trackingSites.length) {
+          window.open(trackingSites[index], '_blank');
+          index++;
+          setTimeout(openNext, 300);
+        }
+      };
+
+      openNext();
+      mostrarDatosSimulados();
+    }
+
+    function mostrarDatosSimulados() {
       document.getElementById("puertoTiempos").innerHTML = "";
-      map.eachLayer(function (layer) {
+
+      map.eachLayer(layer => {
         if (layer instanceof L.Marker) {
           map.removeLayer(layer);
         }
       });
 
-      // Mostrar datos simulados
-      datosSimulados.forEach(p => {
-        L.marker(p.coords).addTo(map).bindPopup(`<strong>${p.nombre}</strong><br>Tiempo
-de tránsito: ${p.tiempo} días`);
-        const row = `<tr><td>${p.nombre}</td><td>${p.tiempo}</td></tr>`;
-        document.getElementById("puertoTiempos").innerHTML += row;
+      puertos.forEach(port => {
+        L.marker(port.coords).addTo(map)
+          .bindPopup(`<strong>${port.name}</strong><br>Tiempo de tránsito: ${port.tiempo} días`);
+        const fila = `<tr><td>${port.name}</td><td>${port.tiempo}</td></tr>`;
+        document.getElementById("puertoTiempos").innerHTML += fila;
       });
 
-      map.setView(datosSimulados[0].coords, 4);
+      map.setView(puertos[0].coords, 4);
     }
+
+    // Mostrar los puertos al cargar
+    mostrarDatosSimulados();
   </script>
 
 </body>
