@@ -1,252 +1,153 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Shiptrack - Seguimiento de carga</title>
-<style>
-body {
-  font-family: Arial, sans-serif;
-  margin: 0;
-  padding: 0;
-  background-color: #f4f4f4;
-  text-align: center;
-}
-header {
-  background-color: #003366;
-  color: white;
-  padding: 15px;
-}
-.contenedor {
-  max-width: 600px;
-  margin: 20px auto;
-  background-color: white;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-input, button {
-  width: 100%;
-  padding: 10px;
-  margin: 10px 0;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-}
-button {
-  background-color: #003366;
-  color: white;
-  border: none;
-  cursor: pointer;
-}
-button:hover {
-  background-color: #002244;
-}
-.mapa-contenedor {
-  margin: 20px auto;
-  width: 90%;
-  height: 500px;
-}
-.tabla-info {
-  width: 90%;
-  margin: 20px auto;
-  background-color: white;
-  border-collapse: collapse;
-}
-.tabla-info th, .tabla-info td {
-  border: 1px solid #ddd;
-  padding: 8px;
-}
-.tabla-info th {
-  background-color: #003366;
-  color: white;
-}
-footer {
-  text-align: center;
-  padding: 10px;
-  background-color: #003366;
-  color: white;
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-}
-#imageContainer {
-  margin-top: 20px;
-  text-align: center;
-}
-#imageContainer img {
-  max-width: 100%;
-  height: auto;
-  margin-top: 20px;
-}
-</style>
-<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <meta charset="UTF-8">
+  <title>Seguimiento de Contenedor</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      width: 90%;
+      max-width: 1000px;
+      margin: auto;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .search-section {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    input[type="text"] {
+      padding: 8px;
+      width: 300px;
+      margin-right: 10px;
+    }
+    button {
+      padding: 8px 15px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: white;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 10px;
+      text-align: left;
+    }
+    th {
+      background-color: #007bff;
+      color: white;
+    }
+    #map {
+      height: 400px;
+      margin-top: 30px;
+      border: 2px solid #ccc;
+    }
+  </style>
 </head>
 <body>
 
-<header>
-  Shiptrack - Seguimiento de carga
-</header>
+<div class="container">
+  <h1>Seguimiento de Contenedor</h1>
 
-<div class="contenedor">
-  <input type="text" id="username" placeholder="Ingrese su nombre de usuario">
-  <input type="text" id="blNumber" placeholder="Ingrese su número de conocimiento de embarque">
-  <button type="button" onclick="buscarBL()">Buscar</button>
-  <button type="button" onclick="mostrarHistorialCompleto()">Ver todo el historial</button>
-  <button type="button" onclick="mostrarAyuda()">Ayuda</button>
-  <input type="file" id="imageInput" accept="image/*" onchange="mostrarImagen(event)">
+  <div class="search-section">
+    <label for="blInput">Número de BL:</label>
+    <input type="text" id="blInput" placeholder="Ej: MEDUQT871264">
+    <button onclick="buscarBL()">Buscar</button>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Puerto</th>
+        <th>Evento</th>
+        <th>Fecha</th>
+      </tr>
+    </thead>
+    <tbody id="tablaEventos"></tbody>
+  </table>
+
+  <div id="map"></div>
 </div>
 
-<div id="mapa" class="mapa-contenedor"></div>
-
-<table class="tabla-info">
-  <thead>
-    <tr>
-      <th>Puerto</th>
-      <th>Evento</th>
-      <th>Fecha</th>
-    </tr>
-  </thead>
-  <tbody id="puertoTiempos"></tbody>
-</table>
-
-<div id="historialBusqueda" class="contenedor"></div>
-
-<div id="imageContainer"></div>
-
-<footer>
-  <p>&copy; 2025 Shiptrack | Desarrollado por Juan Giraldo y Dylan Díaz</p>
-</footer>
-
+<script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
 <script>
-  var map = L.map('mapa').setView([20, 0], 2);  // Mapa centrado globalmente
-
+  const map = L.map('map').setView([20, 0], 2);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; colaboradores de OpenStreetMap'
+    attribution: '&copy; OpenStreetMap contributors'
   }).addTo(map);
 
-function buscarBL() {
-  var bl = document.getElementById("blNumber").value.trim();
-  var user = document.getElementById("username").value.trim();
+  let polyline;
+  let markers = [];
 
-  if (!user) {
-    alert("Por favor ingrese su nombre de usuario.");
-    return;
-  }
+  function buscarBL() {
+    const bl = document.getElementById("blInput").value.trim().toUpperCase();
+    const tabla = document.getElementById("tablaEventos");
+    tabla.innerHTML = "";
 
-  if (bl) {
-    guardarHistorial(user, bl);
+    // Limpiar mapa
+    markers.forEach(m => map.removeLayer(m));
+    markers = [];
+    if (polyline) {
+      map.removeLayer(polyline);
+    }
+
     if (bl === "MEDUQT871264") {
-      mostrarDatosEspecificos();
+      const datos = [
+        { puerto: "Qingdao, CN", evento: "Empty to Shipper", fecha: "10-Feb-2024", coords: [36.0671, 120.3826] },
+        { puerto: "Qingdao, CN", evento: "Export received at CY", fecha: "16-Feb-2024", coords: [36.0671, 120.3826] },
+        { puerto: "Qingdao, CN", evento: "Export Loaded on Vessel", fecha: "17-Feb-2024", coords: [36.0671, 120.3826] },
+        { puerto: "Busan, KR", evento: "Full Transshipment Discharged", fecha: "22-Feb-2024", coords: [35.1796, 129.0756] },
+        { puerto: "Busan, KR", evento: "Full Transshipment Loaded", fecha: "23-Feb-2024", coords: [35.1796, 129.0756] },
+        { puerto: "Buenaventura, CO", evento: "Import Discharged from Vessel", fecha: "25-Mar-2024", coords: [3.8801, -77.0312] },
+        { puerto: "Buenaventura, CO", evento: "Import to Consignee", fecha: "04-Apr-2024", coords: [3.8801, -77.0312] },
+        { puerto: "Buenaventura, CO", evento: "Empty received at CY", fecha: "07-Apr-2024", coords: [3.8801, -77.0312] }
+      ];
+
+      const puntosRuta = [];
+
+      datos.forEach(item => {
+        // Añadir fila a la tabla
+        const fila = document.createElement("tr");
+        fila.innerHTML = `<td>${item.puerto}</td><td>${item.evento}</td><td>${item.fecha}</td>`;
+        tabla.appendChild(fila);
+
+        // Añadir marcador al mapa solo si es la primera vez que ese puerto aparece
+        const yaExiste = puntosRuta.find(p => p[0] === item.coords[0] && p[1] === item.coords[1]);
+        if (!yaExiste) {
+          const marker = L.marker(item.coords).addTo(map)
+            .bindPopup(`<strong>${item.puerto}</strong><br>${item.evento}<br>${item.fecha}`);
+          markers.push(marker);
+          puntosRuta.push(item.coords);
+        }
+      });
+
+      // Dibujar línea
+      polyline = L.polyline(puntosRuta, { color: 'blue' }).addTo(map);
+      map.fitBounds(polyline.getBounds());
+
     } else {
-      mostrarDatosSimulados();
+      alert("No se encontraron datos para este número de BL.");
     }
-  } else {
-    alert("Por favor ingrese un número de conocimiento de embarque.");
   }
-}
+</script>
 
-function guardarHistorial(usuario, bl) {
-  let historial = JSON.parse(localStorage.getItem('historialBL')) || {};
-  if (!historial[usuario]) {
-    historial[usuario] = [];
-  }
-  historial[usuario].unshift({ bl: bl, fecha: new Date().toLocaleString() });
-  historial[usuario] = historial[usuario].slice(0, 10);
-  localStorage.setItem('historialBL', JSON.stringify(historial));
-  mostrarHistorial();
-}
-
-function mostrarHistorial() {
-  const historialDiv = document.getElementById('historialBusqueda');
-  const user = document.getElementById("username")?.value.trim();
-  historialDiv.innerHTML = `<h3>Historial de búsqueda</h3>`;
-  if (!user) {
-    historialDiv.innerHTML += `<p>Ingrese su nombre para ver historial.</p>`;
-    return;
-  }
-  const historial = JSON.parse(localStorage.getItem('historialBL')) || {};
-  if (!historial[user] || historial[user].length === 0) {
-    historialDiv.innerHTML += `<p>No hay búsquedas recientes.</p>`;
-    return;
-  }
-  const lista = document.createElement('ul');
-  historial[user].forEach(item => {
-    const li = document.createElement('li');
-    li.textContent = `BL: ${item.bl} - ${item.fecha}`;
-    lista.appendChild(li);
-  });
-  historialDiv.appendChild(lista);
-}
-
-function mostrarHistorialCompleto() {
-  const historialDiv = document.getElementById('historialBusqueda');
-  const user = document.getElementById("username")?.value.trim();
-  historialDiv.innerHTML = `<h3>Historial completo de búsqueda</h3>`;
-  if (!user) {
-    historialDiv.innerHTML += `<p>Ingrese su nombre para ver historial.</p>`;
-    return;
-  }
-  const historial = JSON.parse(localStorage.getItem('historialBL')) || {};
-  if (!historial[user] || historial[user].length === 0) {
-    historialDiv.innerHTML += `<p>No hay búsquedas recientes.</p>`;
-    return;
-  }
-  const lista = document.createElement('ul');
-  historial[user].forEach(item => {
-    const li = document.createElement('li');
-    li.textContent = `BL: ${item.bl} - ${item.fecha}`;
-    lista.appendChild(li);
-  });
-  historialDiv.appendChild(lista);
-}
-
-function mostrarAyuda() {
-  alert("Ingrese su nombre de usuario y el número de conocimiento de embarque para seguir el progreso de su carga. Luego, puede visualizar el mapa, el historial de eventos y los detalles de su carga.");
-}
-
-function mostrarImagen(event) {
-  const file = event.target.files[0];
-  if (file) {
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      const img = new Image();
-      img.src = e.target.result;
-      const imageContainer = document.getElementById('imageContainer');
-      imageContainer.innerHTML = `<p>Imagen cargada para el BL: ${document.getElementById("blNumber").value}</p>`;
-      imageContainer.appendChild(img);
-    };
-    reader.readAsDataURL(file);
-  }
-}
-
-function mostrarDatosEspecificos() {
-  const ruta = [
-    { name: "Qingdao, CN", evento: "Empty to Shipper", fecha: "10 Feb 2025 00:00", coords: [36.0671, 120.3826] },
-    { name: "Qingdao, CN", evento: "Export received at CY", fecha: "16 Feb 2025 00:00", coords: [36.0671, 120.3826] },
-    { name: "Qingdao, CN", evento: "Export Loaded on Vessel", fecha: "17 Feb 2025 00:00", coords: [36.0671, 120.3826] },
-    { name: "Busan, KR", evento: "Full Transshipment Discharged", fecha: "22 Feb 2025 00:00", coords: [35.1796, 129.0756] },
-    { name: "Busan, KR", evento: "Full Transshipment Loaded", fecha: "23 Feb 2025 00:00", coords: [35.1796, 129.0756] },
-    { name: "Buenaventura, CO", evento: "Import Discharged from Vessel", fecha: "25 Mar 2025 00:00", coords: [3.8801, -77.0312] },
-    { name: "Buenaventura, CO", evento: "Import to consignee", fecha: "4 Apr 2025 00:00", coords: [3.8801, -77.0312] },
-    { name: "Buenaventura, CO", evento: "Empty received at CY", fecha: "7 Apr 2025 00:00", coords: [3.8801, -77.0312] }
-  ];
-  document.getElementById("puertoTiempos").innerHTML = "";
-  map.eachLayer(function (layer) {
-    if (layer instanceof L.Marker || layer instanceof L.Polyline) {
-      map.removeLayer(layer);
-    }
-  });
-  const latlngs = [];
-  ruta.forEach(p => {
-    L.marker(p.coords).addTo(map).bindPopup(`<strong>${p.name}</strong><br>${p.evento}<br>${p.fecha}`);
-    const fila = `<tr><td>${p.name}</td><td>${p.evento}</td><td>${p.fecha}</td></tr>`;
-    document.getElementById("puertoTiempos").innerHTML += fila;
-    latlngs.push(p.coords);
-  });
-  L.polyline(latlngs, {color: 'blue'}).addTo(map);
-  map.setView(ruta[0].coords, 3);
-}
-
-function mostrarDatosSimulados() {
-  const datosSimulados
+</body>
+</html>
