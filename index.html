@@ -69,6 +69,15 @@ footer {
   bottom: 0;
   width: 100%;
 }
+#imageContainer {
+  margin-top: 20px;
+  text-align: center;
+}
+#imageContainer img {
+  max-width: 100%;
+  height: auto;
+  margin-top: 20px;
+}
 </style>
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
@@ -82,8 +91,10 @@ footer {
 <div class="contenedor">
   <input type="text" id="username" placeholder="Ingrese su nombre de usuario">
   <input type="text" id="blNumber" placeholder="Ingrese su número de conocimiento de embarque">
-  <button onclick="buscarBL()">Buscar</button>
-  <button onclick="mostrarHistorialCompleto()">Ver todo el historial</button>
+  <button type="button" onclick="buscarBL()">Buscar</button>
+  <button type="button" onclick="mostrarHistorialCompleto()">Ver todo el historial</button>
+  <button type="button" onclick="mostrarAyuda()">Ayuda</button>
+  <input type="file" id="imageInput" accept="image/*" onchange="mostrarImagen(event)">
 </div>
 
 <div id="mapa" class="mapa-contenedor"></div>
@@ -100,6 +111,8 @@ footer {
 </table>
 
 <div id="historialBusqueda" class="contenedor"></div>
+
+<div id="imageContainer"></div>
 
 <footer>
   <p>&copy; 2025 Shiptrack | Desarrollado por Juan Giraldo y Dylan Díaz</p>
@@ -182,6 +195,25 @@ function mostrarHistorialCompleto() {
   historialDiv.appendChild(lista);
 }
 
+function mostrarAyuda() {
+  alert("Ingrese su nombre de usuario y el número de conocimiento de embarque para seguir el progreso de su carga. Luego, puede visualizar el mapa, el historial de eventos y los detalles de su carga.");
+}
+
+function mostrarImagen(event) {
+  const file = event.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const img = new Image();
+      img.src = e.target.result;
+      const imageContainer = document.getElementById('imageContainer');
+      imageContainer.innerHTML = `<p>Imagen cargada para el BL: ${document.getElementById("blNumber").value}</p>`;
+      imageContainer.appendChild(img);
+    };
+    reader.readAsDataURL(file);
+  }
+}
+
 function mostrarDatosEspecificos() {
   const ruta = [
     { name: "Qingdao, CN", evento: "Empty to Shipper", fecha: "10 Feb 2025 00:00", coords: [36.0671, 120.3826] },
@@ -217,29 +249,4 @@ function mostrarDatosSimulados() {
     { name: "Puerto de Rotterdam", evento: "Descarga estimada", fecha: "5 Jun 2025", coords: [51.9225, 4.4792] }
   ];
   document.getElementById("puertoTiempos").innerHTML = "";
-  map.eachLayer(function (layer) {
-    if (layer instanceof L.Marker || layer instanceof L.Polyline) {
-      map.removeLayer(layer);
-    }
-  });
-  const latlngs = [];
-  datosSimulados.forEach(p => {
-    L.marker(p.coords).addTo(map).bindPopup(`<strong>${p.name}</strong><br>${p.evento}<br>${p.fecha}`);
-    const fila = `<tr><td>${p.name}</td><td>${p.evento}</td><td>${p.fecha}</td></tr>`;
-    document.getElementById("puertoTiempos").innerHTML += fila;
-    latlngs.push(p.coords);
-  });
-  L.polyline(latlngs, {color: 'gray'}).addTo(map);
-  map.setView(datosSimulados[0].coords, 4);
-}
-
-var map = L.map('mapa').setView([20, 0], 2);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  attribution: '&copy; colaboradores de OpenStreetMap'
-}).addTo(map);
-
-window.addEventListener('DOMContentLoaded', () => mostrarHistorial());
-</script>
-
-</body>
-</html>
+  map
