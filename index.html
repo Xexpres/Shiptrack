@@ -1,209 +1,453 @@
 <!DOCTYPE html>
+
 <html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Shiptrack - Seguimiento de Carga</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: #f4f4f4;
-      text-align: center;
-    }
-    header {
-      background-color: #003366;
-      color: white;
-      padding: 15px;
-    }
-    .container {
-      max-width: 1000px;
-      margin: 20px auto;
-      background-color: white;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
-    input, button {
-      width: 100%;
-      padding: 10px;
-      margin: 10px 0;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-    }
-    button {
-      background-color: #003366;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #002244;
-    }
-    #map {
-      margin: 20px auto;
-      width: 90%;
-      height: 500px;
-    }
-    table {
-      width: 90%;
-      margin: 20px auto;
-      background-color: white;
-      border-collapse: collapse;
-    }
-    th, td {
-      border: 1px solid #ddd;
-      padding: 8px;
-    }
-    th {
-      background-color: #003366;
-      color: white;
-    }
-    footer {
-      text-align: center;
-      padding: 10px;
-      background-color: #003366;
-      color: white;
-      position: fixed;
-      bottom: 0;
-      width: 100%;
-    }
-  </style>
-</head>
-<body>
 
-<header>
-  <h1>Shiptrack - Seguimiento de Carga</h1>
-</header>
+<cabeza>
 
-<div class="container">
-  <input type="text" id="blInput" placeholder="Ingrese su número de conocimiento de embarque (BL)">
-  <button onclick="buscarBL()">Buscar</button>
+<meta charset="UTF-8">
+
+<meta name="viewport" content="ancho=ancho-del-dispositivo, escala-inicial=1.0">
+
+<title>Shiptrack - Seguimiento de Carga</title>
+
+<link rel="hoja de estilo"
+href=" https://unpkg.com/leaflet@1.9.3/dist/leaflet.css " / >
+
+<estilo>
+
+cuerpo {
+
+familia de fuentes: Arial, sans-serif;
+
+margen: 0;
+
+relleno: 0;
+
+color de fondo: #f4f4f4;
+
+alinear texto: centro;
+
+}
+
+encabezado {
+
+color de fondo: #003366;
+
+color: blanco;
+
+relleno: 15px;
+
+}
+
+.contenedor {
+
+ancho máximo: 1000px;
+
+margen: 20px automático;
+
+color de fondo: blanco;
+
+relleno: 20px;
+
+radio del borde: 8px;
+
+caja-sombra: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+}
+
+entrada, botón {
+
+ancho: 100%;
+
+relleno: 10px;
+
+margen: 10px 0;
+
+borde: 1px sólido #ddd;
+
+radio del borde: 4px;
+
+}
+
+botón {
+
+color de fondo: #003366;
+
+color: blanco;
+
+borde: ninguno;
+
+cursor: puntero;
+
+}
+
+botón:hover {
+
+color de fondo: #002244;
+
+}
+
+#mapa {
+
+margen: 20px automático;
+
+ancho: 90%;
+
+altura: 500px;
+
+}
+
+mesa {
+
+ancho: 90%;
+
+margen: 20px automático;
+
+color de fondo: blanco;
+
+colapso de frontera: colapso;
+
+}
+
+el, td {
+
+borde: 1px sólido #ddd;
+
+relleno: 8px;
+
+}
+
+el {
+
+color de fondo: #003366;
+
+color: blanco;
+
+}
+
+pie de página {
+
+alinear texto: centro;
+
+relleno: 10px;
+
+color de fondo: #003366;
+
+color: blanco;
+
+posición: fija;
+
+abajo: 0;
+
+ancho: 100%;
+
+}
+
+</estilo>
+
+</cabeza>
+
+<cuerpo>
+
+<encabezado>
+
+<h1>Shiptrack - Seguimiento de Carga</h1>
+
+</encabezado>
+
+<div class="contenedor">
+
+<input type="text" id="blInput" placeholder="Ingrese su número de
+conocimiento de embarque (BL)">
+
+<button onclick="buscarBL()">Buscar</button>
+
 </div>
 
-<div id="map"></div>
+<div id="mapa"></div>
 
-<table>
-  <thead>
-    <tr>
-      <th>Puerto</th>
-      <th>Evento / Tiempo de tránsito</th>
-      <th>Fecha (si aplica)</th>
-    </tr>
-  </thead>
-  <tbody id="tablaEventos"></tbody>
-</table>
+<tabla>
 
-<footer>
-  &copy; 2025 Shiptrack | Desarrollado por Juan Giraldo y Dylan Díaz
-</footer>
+<cabeza>
 
-<script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
-<script>
-  const map = L.map('map').setView([20, 0], 2);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; OpenStreetMap contributors'
-  }).addTo(map);
+<tr>
 
-  let polyline;
-  let markers = [];
+Puerto
 
-  function buscarBL() {
-    const bl = document.getElementById("blInput").value.trim().toUpperCase();
-    const tabla = document.getElementById("tablaEventos");
-    tabla.innerHTML = "";
+<th>Evento / Tiempo de tránsito</th>
 
-    markers.forEach(m => map.removeLayer(m));
-    markers = [];
-    if (polyline) map.removeLayer(polyline);
+Fecha (si aplica)
 
-    if (!bl) {
-      alert("Por favor ingrese un número de conocimiento de embarque.");
-      return;
-    }
+</tr>
 
-    // Se eliminaron las aperturas de páginas externas
-    /*
-    const trackingSites = [
-      `https://www.msc.com/en/track-a-shipment?bl=${bl}`,
-      `https://www.one-line.com/en/standard-page/track-trace?bl=${bl}`,
-      `https://www.maersk.com/tracking/${bl}`,
-      `https://www.hapag-lloyd.com/es/online-business/track/track-by-booking.html?bl=${bl}`,
-      `https://www.evergreen-line.com/ticket/Tracking?bl=${bl}`
-    ];
+</cabeza>
 
-    let i = 0;
-    const openNext = () => {
-      if (i < trackingSites.length) {
-        window.open(trackingSites[i], '_blank');
-        i++;
-        setTimeout(openNext, 300);
-      }
-    };
-    openNext();
-    */
+<tbody id="tablaEventos"></tbody>
 
-    if (bl === "MEDUQT871264") {
-      const datos = [
-        { puerto: "Qingdao, CN", evento: "Empty to Shipper", fecha: "10-Feb-2024", coords: [36.0671, 120.3826] },
-        { puerto: "Qingdao, CN", evento: "Export received at CY", fecha: "16-Feb-2024", coords: [36.0671, 120.3826] },
-        { puerto: "Qingdao, CN", evento: "Export Loaded on Vessel", fecha: "17-Feb-2024", coords: [36.0671, 120.3826] },
-        { puerto: "Busan, KR", evento: "Full Transshipment Discharged", fecha: "22-Feb-2024", coords: [35.1796, 129.0756] },
-        { puerto: "Busan, KR", evento: "Full Transshipment Loaded", fecha: "23-Feb-2024", coords: [35.1796, 129.0756] },
-        { puerto: "Buenaventura, CO", evento: "Import Discharged from Vessel", fecha: "25-Mar-2024", coords: [3.8801, -77.0312] },
-        { puerto: "Buenaventura, CO", evento: "Import to Consignee", fecha: "04-Apr-2024", coords: [3.8801, -77.0312] },
-        { puerto: "Buenaventura, CO", evento: "Empty received at CY", fecha: "07-Apr-2024", coords: [3.8801, -77.0312] }
-      ];
+</tabla>
 
-      const puntosRuta = [];
+<pie de página>
 
-      datos.forEach(item => {
-        const fila = document.createElement("tr");
-        fila.innerHTML = `<td>${item.puerto}</td><td>${item.evento}</td><td>${item.fecha}</td>`;
-        tabla.appendChild(fila);
+&Copiar; Seguimiento de barcos 2025 | Desarrollado por Juan Giraldo y Dylan Díaz.
 
-        const existe = puntosRuta.find(p => p[0] === item.coords[0] && p[1] === item.coords[1]);
-        if (!existe) {
-          const marker = L.marker(item.coords).addTo(map)
-            .bindPopup(`<strong>${item.puerto}</strong><br>${item.evento}<br>${item.fecha}`);
-          markers.push(marker);
-          puntosRuta.push(item.coords);
-        }
-      });
+</pie de página>
 
-      polyline = L.polyline(puntosRuta, { color: 'blue' }).addTo(map);
-      map.fitBounds(polyline.getBounds());
+<script src=" https://unpkg.com/leaflet@1.9.3/dist/leaflet.js " > </script>
 
-    } else {
-      mostrarDatosGenerales();
-    }
-  }
+<guión>
 
-  function mostrarDatosGenerales() {
-    const puertos = [
-      { nombre: "Puerto de Shanghai", coords: [31.2304, 121.4737], tiempo: 25 },
-      { nombre: "Puerto de Cartagena", coords: [10.4000, -75.5167], tiempo: 6 },
-      { nombre: "Puerto de Rotterdam", coords: [51.9225, 4.4792], tiempo: 15 },
-      { nombre: "Puerto de Buenaventura", coords: [3.8801, -77.0312], tiempo: 7 },
-      { nombre: "Puerto de Valencia", coords: [39.4667, -0.375], tiempo: 12 },
-      { nombre: "Puerto de Santos", coords: [-23.954, -46.3336], tiempo: 14 }
-    ];
+constante map = L.map('mapa').setView([20, 0], 2);
 
-    const tabla = document.getElementById("tablaEventos");
-    puertos.forEach(p => {
-      const fila = `<tr><td>${p.nombre}</td><td>${p.tiempo} días</td><td>-</td></tr>`;
-      tabla.innerHTML += fila;
-      const marker = L.marker(p.coords).addTo(map)
-        .bindPopup(`<strong>${p.nombre}</strong><br>Tiempo estimado: ${p.tiempo} días`);
-      markers.push(marker);
-    });
+L.tileLayer('https://{s}. mosaico . openstreetmap.org/{z}/{x}/{y} . png ', {
 
-    map.setView(puertos[0].coords, 2);
-  }
+atribución: '&copy; colaboradores de OpenStreetMap'
+
+}).addTo(mapa);
+
+dejar polilinea;
+
+deje que los marcadores = [];
+
+función buscarBL() {
+
+const bl = document.getElementById("blNumber").value.trim();
+
+si (!bl) {
+
+alert("Por favor ingrese un número de conocimiento de embarque.");
+
+devolver;
+
+}
+
+ 
+
+// Guardar la búsqueda en localStorage
+
+let historico = JSON.parse(localStorage.getItem("busquedas")) || [];
+
+histórico.push(bl);
+
+localStorage.setItem("buscadas", JSON.stringify(historico));
+
+ 
+
+// Limpiar tabla y mapa
+
+document.getElementById("puertoTiempos").innerHTML = "";
+
+map.eachLayer(función (capa) {
+
+si (capa instancia de L.Marker) {
+
+mapa.removeLayer(capa);
+
+}
+
+});
+
+ 
+
+// BL: MEDUQT871264
+
+si (bl === "MEDUQT871264") {
+
+constante rutaEspecial = [
+
+{
+
+nombre: "Qingdao, CN - Exportación cargada",
+
+coordenadas: [36.0671, 120.3826],
+
+tiempo: "17 de febrero de 2025"
+
+},
+
+{
+
+nombre: "Busan, KR - Transbordo",
+
+coordenadas: [35.1796, 129.0756],
+
+tiempo: "22-23 de febrero de 2025"
+
+},
+
+{
+
+nombre: "Buenaventura, CO - Dado de alta",
+
+coordenadas: [3.8801, -77.0312],
+
+tiempo: "25 de marzo de 2025"
+
+}
+
+];
+
+ 
+
+rutaEspecial.forEach(p => {
+
+L.marker(p.coords).addTo(map).bindPopup(`<strong>${p.nombre}</strong><br>Fecha: ${p.tiempo}`);
+
+const fila = `<tr><td>${p.nombre}</td><td>${p.tiempo}</td></tr>`;
+
+document.getElementById("puertoTiempos").innerHTML += fila;
+
+});
+
+ 
+
+map.setView(rutaEspecial[1].coords, 3); // Centrar en Busan
+
+ 
+
+// NUEVO: BL 250339340
+
+} de lo contrario si (bl === "250339340") {
+
+const rutaShanghaiBuenaventura = [
+
+{
+
+nombre: "Shanghai, CN - Puerta vacía",
+
+coordenadas: [31.2304, 121.4737],
+
+tiempo: "24 feb 2025 17:41"
+
+},
+
+{
+
+nombre: "Shanghai, CN - Puerta de entrada / Carga",
+
+coordenadas: [31.2304, 121.4737],
+
+tiempo: "26 de febrero de 2025 - 5 de marzo de 2025"
+
+},
+
+{
+
+nombre: "Shanghai, CN - Salida del Buque",
+
+coordenadas: [31.2304, 121.4737],
+
+tiempo: "6 Mar 2025 04:30"
+
+},
+
+{
+
+nombre: "Buenaventura, CO - Llegada de Buques",
+
+coordenadas: [3.8801, -77.0312],
+
+tiempo: "3 de abril de 2025, 19:51"
+
+},
+
+{
+
+nombre: "Buenaventura, CO - Alta",
+
+coordenadas: [3.8801, -77.0312],
+
+tiempo: "4 de abril de 2025, 5:24"
+
+},
+
+{
+
+nombre: "Buenaventura, CO - Puerta de salida / Regreso vacío",
+
+coordenadas: [3.8801, -77.0312],
+
+tiempo: "8-9 de abril de 2025"
+
+}
+
+];
+
+ 
+
+rutaShanghaiBuenaventura.forEach(p => {
+
+L.marker(p.coords).addTo(map).bindPopup(`<strong>${p.nombre}</strong><br>Fecha: ${p.tiempo}`);
+
+const fila = `<tr><td>${p.nombre}</td><td>${p.tiempo}</td></tr>`;
+
+document.getElementById("puertoTiempos").innerHTML += fila;
+
+});
+
+ 
+
+map.setView([20.0, -130.0], 3); // Vista intermedia Pacífico
+
+ 
+
+} demás {
+
+// Mostrar datos simulados genéricos
+
+datosSimulados.forEach(p => {
+
+L.marker(p.coords).addTo(map).bindPopup(`<strong>${p.nombre}</strong><br>Tiempo de tránsito: ${p.tiempo} días`);
+
+const fila = `<tr><td>${p.nombre}</td><td>${p.tiempo}</td></tr>`;
+
+document.getElementById("puertoTiempos").innerHTML += fila;
+
+});
+
+map.setView(datosSimulados[0].coords, 4);
+
+}
+
+}función mostrarDatosGenerales() {
+
+constante puertos = [
+
+{ nombre: "Puerto de Shanghai", coords: [31.2304, 121.4737], tiempo: 25 },
+
+{ nombre: "Puerto de Cartagena", coords: [10.4000, -75.5167], tiempo: 6 },
+
+{ nombre: "Puerto de Rotterdam", coords: [51.9225, 4.4792], tiempo: 15 },
+
+{ nombre: "Puerto de Buenaventura", coords: [3.8801, -77.0312], tiempo: 7 },
+
+{ nombre: "Puerto de Valencia", coords: [39.4667, -0.375], tiempo: 12 },
+
+{ nombre: "Puerto de Santos", coords: [-23.954, -46.3336], tiempo: 14 }
+
+];
+
+const tabla = document.getElementById("tablaEventos");
+
+puertos.forEach(p => {
+
+const fila = `<tr><td>${p.nombre}</td><td>${p.tiempo} días</td><td>-</td></tr>`;
+
+tabla.innerHTML += fila;
+
+marcador constante = L.marcador(p.coords).addTo(mapa)
+
+.bindPopup(`<strong>${p.nombre}</strong><br>Tiempo estimado: ${p.tiempo} días`);
+
+marcadores.push(marcador);
+
+});
+
+map.setView(puertos[0].coords, 2);
+
+}
+
 </script>
 
-</body>
-</html>
+</cuerpo>
 
+</html>
