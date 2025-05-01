@@ -83,6 +83,7 @@
   </style>
 </head>
 <body>
+
   <header>
     <h1>Shiptrack - Seguimiento de Carga</h1>
   </header>
@@ -112,13 +113,13 @@
 
   <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
   <script>
-    const mapa = L.map('mapa').setView([20, 0], 2);
-
+    const map = L.map('mapa').setView([20, 0], 2);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; colaboradores de OpenStreetMap'
-    }).addTo(mapa);
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
 
-    let marcadores = [];
+    let polyline;
+    let markers = [];
 
     function buscarBL() {
       const bl = document.getElementById("blInput").value.trim();
@@ -127,56 +128,59 @@
         return;
       }
 
-      document.getElementById("tablaEventos").innerHTML = "";
+      // Guardar historial
+      let historico = JSON.parse(localStorage.getItem("busquedas")) || [];
+      historico.push(bl);
+      localStorage.setItem("busquedas", JSON.stringify(historico));
 
-      marcadores.forEach(m => mapa.removeLayer(m));
-      marcadores = [];
+      // Limpiar tabla, marcadores y líneas
+      document.getElementById("tablaEventos").innerHTML = "";
+      markers.forEach(m => map.removeLayer(m));
+      markers = [];
+      if (polyline) {
+        map.removeLayer(polyline);
+        polyline = null;
+      }
+
+      let rutaEspecial = [];
 
       if (bl === "MEDUQT871264") {
-        const ruta = [
+        rutaEspecial = [
           { nombre: "Qingdao, CN - Exportación cargada", coords: [36.0671, 120.3826], tiempo: "17 de febrero de 2025" },
           { nombre: "Busan, KR - Transbordo", coords: [35.1796, 129.0756], tiempo: "22-23 de febrero de 2025" },
           { nombre: "Buenaventura, CO - Dado de alta", coords: [3.8801, -77.0312], tiempo: "25 de marzo de 2025" }
         ];
-        mostrarRuta(ruta);
-        mapa.setView(ruta[1].coords, 3);
 
       } else if (bl === "250339340") {
-        const ruta = [
+        rutaEspecial = [
           { nombre: "Shanghai, CN - Puerta vacía", coords: [31.2304, 121.4737], tiempo: "24 feb 2025 17:41" },
           { nombre: "Shanghai, CN - Carga", coords: [31.2304, 121.4737], tiempo: "26 feb - 5 mar 2025" },
-          { nombre: "Shanghai, CN - Salida del Buque", coords: [31.2304, 121.4737], tiempo: "6 mar 2025 04:30" },
-          { nombre: "Buenaventura, CO - Llegada de Buques", coords: [3.8801, -77.0312], tiempo: "3 abril 2025 19:51" },
-          { nombre: "Buenaventura, CO - Alta", coords: [3.8801, -77.0312], tiempo: "4 abril 2025 5:24" },
-          { nombre: "Buenaventura, CO - Salida vacía", coords: [3.8801, -77.0312], tiempo: "8-9 abril 2025" }
+          { nombre: "Shanghai, CN - Salida del buque", coords: [31.2304, 121.4737], tiempo: "6 mar 2025 04:30" },
+          { nombre: "Buenaventura, CO - Llegada", coords: [3.8801, -77.0312], tiempo: "3 abril 2025, 19:51" },
+          { nombre: "Buenaventura, CO - Alta", coords: [3.8801, -77.0312], tiempo: "4 abril 2025, 5:24" },
+          { nombre: "Buenaventura, CO - Regreso vacío", coords: [3.8801, -77.0312], tiempo: "8-9 abril 2025" }
         ];
-        mostrarRuta(ruta);
-        mapa.setView([20, -130], 3);
 
       } else {
-        const datosSimulados = [
-          { nombre: "Puerto Simulado A", coords: [40, -20], tiempo: "10 días" },
-          { nombre: "Puerto Simulado B", coords: [10, 10], tiempo: "15 días" }
-        ];
-        datosSimulados.forEach(p => {
-          const marcador = L.marker(p.coords).addTo(mapa).bindPopup(`<strong>${p.nombre}</strong><br>Tiempo de tránsito: ${p.tiempo}`);
-          marcadores.push(marcador);
-          document.getElementById("tablaEventos").innerHTML += `<tr><td>${p.nombre}</td><td>${p.tiempo}</td><td>-</td></tr>`;
-        });
-        mapa.setView(datosSimulados[0].coords, 4);
+        alert("Número de BL no reconocido.");
+        return;
       }
-    }
 
-    function mostrarRuta(ruta) {
-      ruta.forEach(p => {
-        const marcador = L.marker(p.coords).addTo(mapa).bindPopup(`<strong>${p.nombre}</strong><br>Fecha: ${p.tiempo}`);
-        marcadores.push(marcador);
-        document.getElementById("tablaEventos").innerHTML += `<tr><td>${p.nombre}</td><td>-</td><td>${p.tiempo}</td></tr>`;
+      const coordsLinea = [];
+      rutaEspecial.forEach(p => {
+        const marker = L.marker(p.coords).addTo(map).bindPopup(`<strong>${p.nombre}</strong><br>Fecha: ${p.tiempo}`);
+        markers.push(marker);
+        coordsLinea.push(p.coords);
+        const fila = `<tr><td>${p.nombre}</td><td>${p.tiempo}</td><td>-</td></tr>`;
+        document.getElementById("tablaEventos").innerHTML += fila;
       });
+
+      polyline = L.polyline(coordsLinea, { color: 'blue' }).addTo(map);
+      map.fitBounds(polyline.getBounds());
     }
 
     function mostrarAyuda() {
-      alert("Para soporte, escriba a soporte@shiptrack.com o llame al +57 123 456 7890.");
+      alert("Para ayuda, contáctanos al correo: soporte@shiptrack.com o visita nuestra página de contacto.");
     }
   </script>
 </body>
