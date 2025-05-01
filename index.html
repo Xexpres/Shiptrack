@@ -83,6 +83,7 @@ footer {
   <input type="text" id="username" placeholder="Ingrese su nombre de usuario">
   <input type="text" id="blNumber" placeholder="Ingrese su número de conocimiento de embarque">
   <button onclick="buscarBL()">Buscar</button>
+  <button onclick="mostrarHistorialCompleto()">Ver todo el historial</button>
 </div>
 
 <div id="mapa" class="mapa-contenedor"></div>
@@ -91,7 +92,8 @@ footer {
   <thead>
     <tr>
       <th>Puerto</th>
-      <th>Tiempo de tránsito estimado (días)</th>
+      <th>Evento</th>
+      <th>Fecha</th>
     </tr>
   </thead>
   <tbody id="puertoTiempos"></tbody>
@@ -115,26 +117,11 @@ function buscarBL() {
 
   if (bl) {
     guardarHistorial(user, bl);
-
-    const trackingSites = [
-      `https://www.msc.com/en/track-a-shipment?bl=${bl}`,
-      `https://www.one-line.com/en/standard-page/track-trace?bl=${bl}`,
-      `https://www.maersk.com/tracking/${bl}`,
-      `https://www.hapag-lloyd.com/es/online-business/track/track-by-booking.html?bl=${bl}`,
-      `https://www.evergreen-line.com/ticket/Tracking?bl=${bl}`
-    ];
-
-    let index = 0;
-    const openNext = () => {
-      if (index < trackingSites.length) {
-        window.open(trackingSites[index], '_blank');
-        index++;
-        setTimeout(openNext, 300);
-      }
-    };
-
-    openNext();
-    mostrarDatosSimulados();
+    if (bl === "MEDUQT871264") {
+      mostrarDatosEspecificos();
+    } else {
+      mostrarDatosSimulados();
+    }
   } else {
     alert("Por favor ingrese un número de conocimiento de embarque.");
   }
@@ -173,23 +160,76 @@ function mostrarHistorial() {
   historialDiv.appendChild(lista);
 }
 
-function mostrarDatosSimulados() {
-  const datosSimulados = [
-    { name: "Puerto de Shanghai", coords: [31.2304, 121.4737], tiempo: 25 },
-    { name: "Puerto de Cartagena", coords: [10.4000, -75.5167], tiempo: 6 },
-    { name: "Puerto de Rotterdam", coords: [51.9225, 4.4792], tiempo: 15 }
+function mostrarHistorialCompleto() {
+  const historialDiv = document.getElementById('historialBusqueda');
+  const user = document.getElementById("username")?.value.trim();
+  historialDiv.innerHTML = `<h3>Historial completo de búsqueda</h3>`;
+  if (!user) {
+    historialDiv.innerHTML += `<p>Ingrese su nombre para ver historial.</p>`;
+    return;
+  }
+  const historial = JSON.parse(localStorage.getItem('historialBL')) || {};
+  if (!historial[user] || historial[user].length === 0) {
+    historialDiv.innerHTML += `<p>No hay búsquedas recientes.</p>`;
+    return;
+  }
+  const lista = document.createElement('ul');
+  historial[user].forEach(item => {
+    const li = document.createElement('li');
+    li.textContent = `BL: ${item.bl} - ${item.fecha}`;
+    lista.appendChild(li);
+  });
+  historialDiv.appendChild(lista);
+}
+
+function mostrarDatosEspecificos() {
+  const ruta = [
+    { name: "Qingdao, CN", evento: "Empty to Shipper", fecha: "10 Feb 2025 00:00", coords: [36.0671, 120.3826] },
+    { name: "Qingdao, CN", evento: "Export received at CY", fecha: "16 Feb 2025 00:00", coords: [36.0671, 120.3826] },
+    { name: "Qingdao, CN", evento: "Export Loaded on Vessel", fecha: "17 Feb 2025 00:00", coords: [36.0671, 120.3826] },
+    { name: "Busan, KR", evento: "Full Transshipment Discharged", fecha: "22 Feb 2025 00:00", coords: [35.1796, 129.0756] },
+    { name: "Busan, KR", evento: "Full Transshipment Loaded", fecha: "23 Feb 2025 00:00", coords: [35.1796, 129.0756] },
+    { name: "Buenaventura, CO", evento: "Import Discharged from Vessel", fecha: "25 Mar 2025 00:00", coords: [3.8801, -77.0312] },
+    { name: "Buenaventura, CO", evento: "Import to consignee", fecha: "4 Apr 2025 00:00", coords: [3.8801, -77.0312] },
+    { name: "Buenaventura, CO", evento: "Empty received at CY", fecha: "7 Apr 2025 00:00", coords: [3.8801, -77.0312] }
   ];
   document.getElementById("puertoTiempos").innerHTML = "";
   map.eachLayer(function (layer) {
-    if (layer instanceof L.Marker) {
+    if (layer instanceof L.Marker || layer instanceof L.Polyline) {
       map.removeLayer(layer);
     }
   });
-  datosSimulados.forEach(p => {
-    L.marker(p.coords).addTo(map).bindPopup(`<strong>${p.name}</strong><br>Tiempo de tránsito: ${p.tiempo} días`);
-    const fila = `<tr><td>${p.name}</td><td>${p.tiempo}</td></tr>`;
+  const latlngs = [];
+  ruta.forEach(p => {
+    L.marker(p.coords).addTo(map).bindPopup(`<strong>${p.name}</strong><br>${p.evento}<br>${p.fecha}`);
+    const fila = `<tr><td>${p.name}</td><td>${p.evento}</td><td>${p.fecha}</td></tr>`;
     document.getElementById("puertoTiempos").innerHTML += fila;
+    latlngs.push(p.coords);
   });
+  L.polyline(latlngs, {color: 'blue'}).addTo(map);
+  map.setView(ruta[0].coords, 3);
+}
+
+function mostrarDatosSimulados() {
+  const datosSimulados = [
+    { name: "Puerto de Shanghai", evento: "Llegada estimada", fecha: "15 May 2025", coords: [31.2304, 121.4737] },
+    { name: "Puerto de Cartagena", evento: "En tránsito", fecha: "25 May 2025", coords: [10.4000, -75.5167] },
+    { name: "Puerto de Rotterdam", evento: "Descarga estimada", fecha: "5 Jun 2025", coords: [51.9225, 4.4792] }
+  ];
+  document.getElementById("puertoTiempos").innerHTML = "";
+  map.eachLayer(function (layer) {
+    if (layer instanceof L.Marker || layer instanceof L.Polyline) {
+      map.removeLayer(layer);
+    }
+  });
+  const latlngs = [];
+  datosSimulados.forEach(p => {
+    L.marker(p.coords).addTo(map).bindPopup(`<strong>${p.name}</strong><br>${p.evento}<br>${p.fecha}`);
+    const fila = `<tr><td>${p.name}</td><td>${p.evento}</td><td>${p.fecha}</td></tr>`;
+    document.getElementById("puertoTiempos").innerHTML += fila;
+    latlngs.push(p.coords);
+  });
+  L.polyline(latlngs, {color: 'gray'}).addTo(map);
   map.setView(datosSimulados[0].coords, 4);
 }
 
@@ -198,44 +238,8 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '&copy; colaboradores de OpenStreetMap'
 }).addTo(map);
 
-var puertos = [
-  { nombre: "Puerto de Shanghai", coords: [31.2304, 121.4737], tiempo: 25 },
-  { nombre: "Puerto de Singapur", coords: [1.3521, 103.8198], tiempo: 20 },
-  { nombre: "Puerto de Busan", coords: [35.1796, 129.0756], tiempo: 22 },
-  { nombre: "Puerto de Guangzhou", coords: [23.1291, 113.2644], tiempo: 23 },
-  { nombre: "Puerto de Ningbo-Zhoushan", coords: [29.8683, 121.5440], tiempo: 24 },
-  { nombre: "Puerto de Qingdao", coords: [36.0671, 120.3826], tiempo: 26 },
-  { nombre: "Puerto de Tianjin", coords: [39.3434, 117.3616], tiempo: 27 },
-  { nombre: "Port Klang", coords: [3.0333, 101.45], tiempo: 19 },
-  { nombre: "Puerto de Rotterdam", coords: [51.9225, 4.4792], tiempo: 15 },
-  { nombre: "Puerto de Hamburgo", coords: [53.5511, 9.9937], tiempo: 16 },
-  { nombre: "Puerto de Amberes", coords: [51.2194, 4.4025], tiempo: 15 },
-  { nombre: "Puerto de Valencia", coords: [39.4667, -0.375], tiempo: 12 },
-  { nombre: "Puerto de Tánger Med", coords: [35.89, -5.5], tiempo: 11 },
-  { nombre: "Puerto de Felixstowe", coords: [51.963, 1.351], tiempo: 14 },
-  { nombre: "Puerto de Le Havre", coords: [49.4944, 0.1079], tiempo: 13 },
-  { nombre: "Puerto de Génova", coords: [44.4056, 8.9463], tiempo: 14 },
-  { nombre: "Puerto de Los Ángeles", coords: [33.7405, -118.2724], tiempo: 10 },
-  { nombre: "Puerto de Nueva York y Nueva Jersey", coords: [40.6689, -74.0451], tiempo: 9 },
-  { nombre: "Puerto de Savannah", coords: [32.0809, -81.0912], tiempo: 8 },
-  { nombre: "Puerto de Vancouver", coords: [49.2827, -123.1207], tiempo: 12 },
-  { nombre: "Puerto de Santos", coords: [-23.954, -46.3336], tiempo: 14 },
-  { nombre: "Puerto de Dubai (Jebel Ali)", coords: [25.0107, 55.0610], tiempo: 18 },
-  { nombre: "Puerto de Cartagena", coords: [10.4000, -75.5167], tiempo: 6 },
-  { nombre: "Puerto de Buenaventura", coords: [3.8801, -77.0312], tiempo: 7 },
-  { nombre: "Puerto de Santa Marta", coords: [11.2419, -74.2052], tiempo: 6 },
-  { nombre: "Puerto de Barranquilla", coords: [10.9639, -74.7964], tiempo: 6 }
-];
-
-puertos.forEach(p => {
-  L.marker(p.coords).addTo(map).bindPopup(`<strong>${p.nombre}</strong><br>Tiempo de tránsito: ${p.tiempo} días`);
-  const fila = `<tr><td>${p.nombre}</td><td>${p.tiempo}</td></tr>`;
-  document.getElementById("puertoTiempos").innerHTML += fila;
-});
-
 window.addEventListener('DOMContentLoaded', () => mostrarHistorial());
 </script>
 
 </body>
 </html>
-
