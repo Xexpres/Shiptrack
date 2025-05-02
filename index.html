@@ -281,10 +281,16 @@
 
       const coordsLinea = [];
       rutaEspecial.forEach(p => {
-        const marker = L.marker(p.coords).addTo(map).bindPopup(`<strong>${p.nombre}</strong><br>Fecha: ${p.tiempo}`);
+        const marker = L.marker(p.coords).addTo(map).bindPopup(<strong>${p.nombre}</strong><br>Fecha: ${p.tiempo});
         markers.push(marker);
         coordsLinea.push(p.coords);
-        document.getElementById("tablaEventos").innerHTML += `<tr><td>${p.nombre}</td><td>${p.tiempo}</td><td>-</td></tr>`;
+        document.getElementById("tablaEventos").innerHTML += `
+          <tr>
+            <td>${p.nombre}</td>
+            <td>${p.tiempo}</td>
+            <td>-</td>
+          </tr>
+        `;
       });
 
       polyline = L.polyline(coordsLinea, { color: 'blue' }).addTo(map);
@@ -296,7 +302,7 @@
     function enviarFormulario(e) {
       e.preventDefault();
       const nombre = document.getElementById("nombre").value;
-      alert(`Gracias por contactarnos, ${nombre}. Hemos recibido tu mensaje y te responderemos pronto.`);
+      alert(Gracias por contactarnos, ${nombre}. Hemos recibido tu mensaje y te responderemos pronto.);
       document.querySelector("form").reset();
     }
 
