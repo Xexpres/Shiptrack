@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Shiptrack - Seguimiento de Carga</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
   <style>
@@ -18,13 +18,6 @@
       background-color: #003366;
       color: white;
       padding: 15px;
-    }
-
-    nav a {
-      color: white;
-      margin: 0 10px;
-      text-decoration: none;
-      font-weight: bold;
     }
 
     .contenedor {
@@ -88,18 +81,53 @@
       width: 100%;
     }
 
-    #listaHistorial button {
-      background-color: #ddd;
-      color: #003366;
-      margin: 5px;
-      padding: 5px 10px;
-      border-radius: 4px;
+    /* Estilos para el chatbot */
+    #chatbot-btn {
+      position: fixed;
+      bottom: 80px;
+      right: 20px;
+      background-color: #003366;
+      color: white;
       border: none;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      font-size: 28px;
       cursor: pointer;
+      z-index: 999;
     }
 
-    #listaHistorial button:hover {
-      background-color: #bbb;
+    #chat-container {
+      position: fixed;
+      bottom: 150px;
+      right: 20px;
+      width: 300px;
+      background-color: white;
+      border: 2px solid #003366;
+      border-radius: 8px;
+      padding: 10px;
+      display: none;
+      z-index: 999;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    }
+
+    #chat-messages {
+      height: 200px;
+      overflow-y: auto;
+      margin-bottom: 10px;
+      font-size: 14px;
+      text-align: left;
+    }
+
+    #chat-messages p {
+      margin: 5px 0;
+    }
+
+    #chat-input {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
     }
   </style>
 </head>
@@ -107,23 +135,12 @@
 
   <header>
     <h1>Shiptrack - Seguimiento de Carga</h1>
-    <nav>
-      <a href="#" onclick="location.reload()">Inicio</a>
-      <a href="#" onclick="mostrarAyuda()">Ayuda</a>
-      <a href="mailto:soporte@shiptrack.com">Contacto</a>
-      <a href="#">Usuario</a>
-    </nav>
   </header>
 
   <div class="contenedor">
-    <input type="text" id="blInput" placeholder="Ingrese su número de conocimiento de embarque (BL)" />
+    <input type="text" id="blInput" placeholder="Ingrese su número de conocimiento de embarque (BL)">
     <button onclick="buscarBL()">Buscar</button>
     <button onclick="mostrarAyuda()">Ayuda y Contacto</button>
-  </div>
-
-  <div id="historial" class="contenedor" style="display: none;">
-    <h3>Historial de Búsquedas</h3>
-    <ul id="listaHistorial" style="list-style: none; padding-left: 0;"></ul>
   </div>
 
   <div id="mapa"></div>
@@ -163,7 +180,6 @@
       let historico = JSON.parse(localStorage.getItem("busquedas")) || [];
       historico.push(bl);
       localStorage.setItem("busquedas", JSON.stringify(historico));
-      actualizarHistorial();
 
       document.getElementById("tablaEventos").innerHTML = "";
       markers.forEach(m => map.removeLayer(m));
@@ -181,6 +197,7 @@
           { nombre: "Busan, KR - Transbordo", coords: [35.1796, 129.0756], tiempo: "22-23 de febrero de 2025" },
           { nombre: "Buenaventura, CO - Dado de alta", coords: [3.8801, -77.0312], tiempo: "25 de marzo de 2025" }
         ];
+
       } else if (bl === "250339340") {
         rutaEspecial = [
           { nombre: "Shanghai, CN - Puerta vacía", coords: [31.2304, 121.4737], tiempo: "24 feb 2025 17:41" },
@@ -190,6 +207,7 @@
           { nombre: "Buenaventura, CO - Alta", coords: [3.8801, -77.0312], tiempo: "4 abril 2025, 5:24" },
           { nombre: "Buenaventura, CO - Regreso vacío", coords: [3.8801, -77.0312], tiempo: "8-9 abril 2025" }
         ];
+
       } else {
         alert("Número de BL no reconocido.");
         return;
@@ -212,24 +230,54 @@
       alert("Para ayuda, contáctanos al correo: soporte@shiptrack.com o visita nuestra página de contacto.");
     }
 
-    function actualizarHistorial() {
-      const historico = JSON.parse(localStorage.getItem("busquedas")) || [];
-      const lista = document.getElementById("listaHistorial");
-      lista.innerHTML = "";
+    // Chatbot funcional
+    const chatbotBtn = document.createElement("button");
+    chatbotBtn.id = "chatbot-btn";
+    chatbotBtn.title = "Ayuda";
+    chatbotBtn.textContent = "💬";
+    document.body.appendChild(chatbotBtn);
 
-      const recientes = historico.slice(-5).reverse();
-      recientes.forEach(bl => {
-        const item = document.createElement("li");
-        item.innerHTML = `<button onclick="document.getElementById('blInput').value='${bl}'; buscarBL();">${bl}</button>`;
-        lista.appendChild(item);
-      });
+    const chatContainer = document.createElement("div");
+    chatContainer.id = "chat-container";
+    chatContainer.innerHTML = `
+      <div id="chat-messages">
+        <p><strong>Asistente:</strong> ¡Hola! ¿En qué puedo ayudarte?</p>
+      </div>
+      <input type="text" id="chat-input" placeholder="Escribe tu pregunta y presiona Enter..." />
+    `;
+    document.body.appendChild(chatContainer);
 
-      if (recientes.length > 0) {
-        document.getElementById("historial").style.display = "block";
+    const chatInput = chatContainer.querySelector("#chat-input");
+    const chatMessages = chatContainer.querySelector("#chat-messages");
+
+    chatbotBtn.onclick = () => {
+      chatContainer.style.display = chatContainer.style.display === "none" ? "block" : "none";
+    };
+
+    chatInput.addEventListener("keypress", function (e) {
+      if (e.key === "Enter") {
+        const pregunta = chatInput.value.trim();
+        if (!pregunta) return;
+        chatMessages.innerHTML += `<p><strong>Tú:</strong> ${pregunta}</p>`;
+        const respuesta = obtenerRespuesta(pregunta);
+        chatMessages.innerHTML += `<p><strong>Asistente:</strong> ${respuesta}</p>`;
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+        chatInput.value = "";
+      }
+    });
+
+    function obtenerRespuesta(pregunta) {
+      pregunta = pregunta.toLowerCase();
+      if (pregunta.includes("bl") || pregunta.includes("conocimiento")) {
+        return "Para rastrear tu BL, ingresa el número en el campo principal y presiona 'Buscar'.";
+      } else if (pregunta.includes("qué es")) {
+        return "Un conocimiento de embarque (BL) es un documento que prueba el envío de mercancías por vía marítima.";
+      } else if (pregunta.includes("ayuda") || pregunta.includes("no funciona")) {
+        return "Revisa que hayas ingresado un número BL válido. Si persiste, contáctanos al correo soporte@shiptrack.com.";
+      } else {
+        return "Lo siento, no entendí tu pregunta. Por favor intenta con otra consulta.";
       }
     }
-
-    actualizarHistorial();
   </script>
 </body>
 </html>
