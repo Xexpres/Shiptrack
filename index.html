@@ -1,23 +1,42 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Shiptrack - Seguimiento de Carga</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
+  <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/1063/1063191.png" />
   <style>
     body {
       font-family: Arial, sans-serif;
       margin: 0;
       padding: 0;
       background-color: #f4f4f4;
-      text-align: center;
     }
 
     header {
       background-color: #003366;
       color: white;
       padding: 15px;
+      text-align: center;
+    }
+
+    nav {
+      background-color: #002244;
+      padding: 10px;
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    nav a:hover {
+      text-decoration: underline;
     }
 
     .contenedor {
@@ -27,9 +46,10 @@
       padding: 20px;
       border-radius: 8px;
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      text-align: center;
     }
 
-    input, button {
+    input, button, textarea {
       width: 100%;
       padding: 10px;
       margin: 10px 0;
@@ -76,58 +96,19 @@
       padding: 10px;
       background-color: #003366;
       color: white;
-      position: fixed;
-      bottom: 0;
-      width: 100%;
+      margin-top: 30px;
     }
 
-    /* Estilos para el chatbot */
-    #chatbot-btn {
-      position: fixed;
-      bottom: 80px;
-      right: 20px;
-      background-color: #003366;
-      color: white;
-      border: none;
-      border-radius: 50%;
-      width: 60px;
-      height: 60px;
-      font-size: 28px;
-      cursor: pointer;
-      z-index: 999;
-    }
-
-    #chat-container {
-      position: fixed;
-      bottom: 150px;
-      right: 20px;
-      width: 300px;
-      background-color: white;
-      border: 2px solid #003366;
-      border-radius: 8px;
-      padding: 10px;
+    .seccion-oculta {
       display: none;
-      z-index: 999;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
     }
 
-    #chat-messages {
-      height: 200px;
-      overflow-y: auto;
-      margin-bottom: 10px;
-      font-size: 14px;
-      text-align: left;
-    }
-
-    #chat-messages p {
-      margin: 5px 0;
-    }
-
-    #chat-input {
-      width: 100%;
-      padding: 8px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
+    .formulario-contacto {
+      background-color: #ffffff;
+      padding: 20px;
+      margin: 30px auto;
+      border-radius: 8px;
+      max-width: 600px;
     }
   </style>
 </head>
@@ -137,10 +118,15 @@
     <h1>Shiptrack - Seguimiento de Carga</h1>
   </header>
 
-  <div class="contenedor">
+  <nav>
+    <a href="#inicio">Inicio</a>
+    <a href="#cuenta">Mi Cuenta</a>
+    <a href="#contacto">Contacto</a>
+  </nav>
+
+  <div id="inicio" class="contenedor">
     <input type="text" id="blInput" placeholder="Ingrese su número de conocimiento de embarque (BL)">
     <button onclick="buscarBL()">Buscar</button>
-    <button onclick="mostrarAyuda()">Ayuda y Contacto</button>
   </div>
 
   <div id="mapa"></div>
@@ -155,6 +141,24 @@
     </thead>
     <tbody id="tablaEventos"></tbody>
   </table>
+
+  <!-- Sección de "Mi Cuenta" -->
+  <div id="cuenta" class="contenedor seccion-oculta">
+    <h2>Mi Cuenta</h2>
+    <p>Funcionalidad futura: aquí podrás guardar tus BL, recibir notificaciones y personalizar tu experiencia.</p>
+  </div>
+
+  <!-- Formulario de Contacto -->
+  <div id="contacto" class="formulario-contacto">
+    <h2>Contacto</h2>
+    <form onsubmit="enviarFormulario(event)">
+      <input type="text" id="nombre" placeholder="Tu nombre" required>
+      <input type="email" id="email" placeholder="Tu correo electrónico" required>
+      <textarea id="mensaje" placeholder="Tu mensaje o duda" rows="5" required></textarea>
+      <button type="submit">Enviar mensaje</button>
+    </form>
+    <p>También puedes escribirnos a <strong>soporte@shiptrack.com</strong></p>
+  </div>
 
   <footer>
     &copy; Seguimiento de barcos 2025 | Desarrollado por Juan Giraldo y Dylan Díaz.
@@ -207,7 +211,6 @@
           { nombre: "Buenaventura, CO - Alta", coords: [3.8801, -77.0312], tiempo: "4 abril 2025, 5:24" },
           { nombre: "Buenaventura, CO - Regreso vacío", coords: [3.8801, -77.0312], tiempo: "8-9 abril 2025" }
         ];
-
       } else {
         alert("Número de BL no reconocido.");
         return;
@@ -226,58 +229,27 @@
       map.fitBounds(polyline.getBounds());
     }
 
-    function mostrarAyuda() {
-      alert("Para ayuda, contáctanos al correo: soporte@shiptrack.com o visita nuestra página de contacto.");
+    function enviarFormulario(e) {
+      e.preventDefault();
+      const nombre = document.getElementById("nombre").value;
+      const email = document.getElementById("email").value;
+      const mensaje = document.getElementById("mensaje").value;
+
+      alert(`Gracias por contactarnos, ${nombre}. Hemos recibido tu mensaje y te responderemos pronto.`);
+      document.querySelector("form").reset();
     }
 
-    // Chatbot funcional
-    const chatbotBtn = document.createElement("button");
-    chatbotBtn.id = "chatbot-btn";
-    chatbotBtn.title = "Ayuda";
-    chatbotBtn.textContent = "💬";
-    document.body.appendChild(chatbotBtn);
-
-    const chatContainer = document.createElement("div");
-    chatContainer.id = "chat-container";
-    chatContainer.innerHTML = `
-      <div id="chat-messages">
-        <p><strong>Asistente:</strong> ¡Hola! ¿En qué puedo ayudarte?</p>
-      </div>
-      <input type="text" id="chat-input" placeholder="Escribe tu pregunta y presiona Enter..." />
-    `;
-    document.body.appendChild(chatContainer);
-
-    const chatInput = chatContainer.querySelector("#chat-input");
-    const chatMessages = chatContainer.querySelector("#chat-messages");
-
-    chatbotBtn.onclick = () => {
-      chatContainer.style.display = chatContainer.style.display === "none" ? "block" : "none";
-    };
-
-    chatInput.addEventListener("keypress", function (e) {
-      if (e.key === "Enter") {
-        const pregunta = chatInput.value.trim();
-        if (!pregunta) return;
-        chatMessages.innerHTML += `<p><strong>Tú:</strong> ${pregunta}</p>`;
-        const respuesta = obtenerRespuesta(pregunta);
-        chatMessages.innerHTML += `<p><strong>Asistente:</strong> ${respuesta}</p>`;
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-        chatInput.value = "";
-      }
+    // Mostrar secciones al hacer clic en los enlaces del nav
+    document.querySelectorAll("nav a").forEach(link => {
+      link.addEventListener("click", e => {
+        e.preventDefault();
+        const id = link.getAttribute("href").substring(1);
+        document.querySelectorAll(".contenedor").forEach(s => s.classList.add("seccion-oculta"));
+        const seccion = document.getElementById(id);
+        if (seccion) seccion.classList.remove("seccion-oculta");
+        window.scrollTo({ top: seccion.offsetTop - 50, behavior: "smooth" });
+      });
     });
-
-    function obtenerRespuesta(pregunta) {
-      pregunta = pregunta.toLowerCase();
-      if (pregunta.includes("bl") || pregunta.includes("conocimiento")) {
-        return "Para rastrear tu BL, ingresa el número en el campo principal y presiona 'Buscar'.";
-      } else if (pregunta.includes("qué es")) {
-        return "Un conocimiento de embarque (BL) es un documento que prueba el envío de mercancías por vía marítima.";
-      } else if (pregunta.includes("ayuda") || pregunta.includes("no funciona")) {
-        return "Revisa que hayas ingresado un número BL válido. Si persiste, contáctanos al correo soporte@shiptrack.com.";
-      } else {
-        return "Lo siento, no entendí tu pregunta. Por favor intenta con otra consulta.";
-      }
-    }
   </script>
 </body>
 </html>
