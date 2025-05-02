@@ -110,6 +110,15 @@
       border-radius: 8px;
       max-width: 600px;
     }
+
+    .formulario-contacto a {
+      color: #003366;
+      text-decoration: none;
+    }
+
+    .formulario-contacto a:hover {
+      text-decoration: underline;
+    }
   </style>
 </head>
 <body>
@@ -148,16 +157,26 @@
     <p>Funcionalidad futura: aquí podrás guardar tus BL, recibir notificaciones y personalizar tu experiencia.</p>
   </div>
 
-  <!-- Formulario de Contacto -->
-  <div id="contacto" class="formulario-contacto">
+  <!-- Formulario de Contacto mejorado -->
+  <div id="contacto" class="formulario-contacto seccion-oculta">
     <h2>Contacto</h2>
     <form onsubmit="enviarFormulario(event)">
-      <input type="text" id="nombre" placeholder="Tu nombre" required>
-      <input type="email" id="email" placeholder="Tu correo electrónico" required>
+      <label for="nombre">Nombre completo:</label>
+      <input type="text" id="nombre" placeholder="Tu nombre" required />
+
+      <label for="email">Correo electrónico:</label>
+      <input type="email" id="email" placeholder="Tu correo electrónico" required />
+
+      <label for="mensaje">Mensaje:</label>
       <textarea id="mensaje" placeholder="Tu mensaje o duda" rows="5" required></textarea>
+
       <button type="submit">Enviar mensaje</button>
     </form>
-    <p>También puedes escribirnos a <strong>soporte@shiptrack.com</strong></p>
+
+    <p>
+      📧 También puedes escribirnos a <a href="mailto:soporte@shiptrack.com"><strong>soporte@shiptrack.com</strong></a><br />
+      💬 O contáctanos por <a href="https://wa.me/573001112233" target="_blank"><strong>WhatsApp Business</strong></a>
+    </p>
   </div>
 
   <footer>
@@ -244,7 +263,7 @@
       link.addEventListener("click", e => {
         e.preventDefault();
         const id = link.getAttribute("href").substring(1);
-        document.querySelectorAll(".contenedor").forEach(s => s.classList.add("seccion-oculta"));
+        document.querySelectorAll(".contenedor, .formulario-contacto").forEach(s => s.classList.add("seccion-oculta"));
         const seccion = document.getElementById(id);
         if (seccion) seccion.classList.remove("seccion-oculta");
         window.scrollTo({ top: seccion.offsetTop - 50, behavior: "smooth" });
@@ -253,3 +272,4 @@
   </script>
 </body>
 </html>
+
