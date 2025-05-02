@@ -281,10 +281,10 @@
 
       const coordsLinea = [];
       rutaEspecial.forEach(p => {
-        const marker = L.marker(p.coords).addTo(map).bindPopup(`<strong>${p.nombre}</strong><br>Fecha: ${p.tiempo}`);
+        const marker = L.marker(p.coords).addTo(map).bindPopup(<strong>${p.nombre}</strong><br>Fecha: ${p.tiempo});
         markers.push(marker);
         coordsLinea.push(p.coords);
-        document.getElementById("tablaEventos").innerHTML += `<tr><td>${p.nombre}</td><td>${p.tiempo}</td><td>-</td></tr>`;
+        document.getElementById("tablaEventos").innerHTML += <tr><td>${p.nombre}</td><td>${p.tiempo}</td><td>-</td></tr>;
       });
 
       polyline = L.polyline(coordsLinea, { color: 'blue' }).addTo(map);
@@ -296,7 +296,7 @@
     function enviarFormulario(e) {
       e.preventDefault();
       const nombre = document.getElementById("nombre").value;
-      alert(`Gracias por contactarnos, ${nombre}. Hemos recibido tu mensaje y te responderemos pronto.`);
+      alert(Gracias por contactarnos, ${nombre}. Hemos recibido tu mensaje y te responderemos pronto.);
       document.querySelector("form").reset();
     }
 
@@ -316,23 +316,20 @@
 
     function actualizarEstadisticas() {
       document.getElementById("totalCargas").innerText = cargas;
-      const rutasComunesElement = document.getElementById("rutasComunes");
-      rutasComunesElement.innerHTML = "";
-
-      // Estadísticas ejemplo
-      const rutas = [
-        { ruta: "Qingdao, CN - Buenaventura, CO", count: 3 },
-        { ruta: "Shanghai, CN - Buenaventura, CO", count: 2 }
-      ];
-
-      rutas.forEach(ruta => {
-        rutasComunesElement.innerHTML += `<li>${ruta.ruta} (${ruta.count} veces)</li>`;
-      });
-
-      const promedio = (cargas > 0) ? `${(cargas / 3).toFixed(2)} días` : "-";  // Ejemplo de promedio
-      document.getElementById("promedioTransito").innerText = promedio;
+      document.getElementById("rutasComunes").innerHTML = "<li>Shanghai - Buenaventura</li><li>Qingdao - Busan - Buenaventura</li>";
+      document.getElementById("promedioTransito").innerText = "25-35 días";
     }
 
+    document.querySelectorAll("nav a").forEach(link => {
+      link.addEventListener("click", e => {
+        e.preventDefault();
+        const id = link.getAttribute("href").substring(1);
+        document.querySelectorAll(".contenedor").forEach(s => s.classList.add("seccion-oculta"));
+        const seccion = document.getElementById(id);
+        if (seccion) seccion.classList.remove("seccion-oculta");
+        window.scrollTo({ top: seccion.offsetTop - 50, behavior: "smooth" });
+      });
+    });
   </script>
 </body>
 </html>
