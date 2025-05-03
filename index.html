@@ -171,61 +171,6 @@
     .cerrar-panel:hover {
       color: #333;
     }
-
-    /* Estilo para el chat flotante */
-    .chatbot-panel {
-      position: fixed;
-      bottom: 100px;
-      right: 20px;
-      width: 300px;
-      background-color: #ffffff;
-      border-radius: 10px;
-      padding: 15px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-      display: none;
-      z-index: 1001;
-    }
-
-    .chatbot-panel.activo {
-      display: block;
-    }
-
-    .chatbot-mensaje {
-      background-color: #f0f0f0;
-      padding: 8px;
-      margin: 5px 0;
-      border-radius: 5px;
-    }
-
-    .chatbot-entrada {
-      width: 100%;
-      padding: 10px;
-      margin-top: 10px;
-      border-radius: 5px;
-      border: 1px solid #ddd;
-    }
-
-    .boton-chatbot {
-      position: fixed;
-      bottom: 20px;
-      right: 100px;
-      background-color: #003366;
-      color: white;
-      border: none;
-      border-radius: 50%;
-      width: 60px;
-      height: 60px;
-      font-size: 24px;
-      cursor: pointer;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-      z-index: 1001;
-      transition: background-color 0.3s ease, transform 0.2s ease;
-    }
-
-    .boton-chatbot:hover {
-      background-color: #005599;
-      transform: scale(1.1);
-    }
   </style>
 </head>
 <body>
@@ -291,37 +236,8 @@
     <i class="fas fa-chart-bar"></i>
   </button>
 
-  <!-- Botón de Chatbot -->
-  <button class="boton-chatbot" onclick="toggleChatbot()">
-    <i class="fas fa-comments"></i>
-  </button>
-
-  <!-- Panel Chatbot -->
-  <div class="chatbot-panel" id="chatbotPanel">
-    <div class="chatbot-mensaje">¡Hola! ¿En qué puedo ayudarte?</div>
-    <input type="text" id="chatbotInput" class="chatbot-entrada" placeholder="Escribe tu pregunta..." onkeydown="if(event.key === 'Enter') sendMessage()">
-  </div>
-
+  <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
   <script>
-    // Función para abrir y cerrar el chatbot
-    function toggleChatbot() {
-      const panel = document.getElementById("chatbotPanel");
-      panel.classList.toggle("activo");
-    }
-
-    // Función para enviar el mensaje
-    function sendMessage() {
-      const input = document.getElementById("chatbotInput");
-      const message = input.value.trim();
-      if (message) {
-        const messagePanel = document.createElement("div");
-        messagePanel.classList.add("chatbot-mensaje");
-        messagePanel.textContent = "You said: " + message;  // Aquí puedes integrar respuestas del bot
-        document.getElementById("chatbotPanel").appendChild(messagePanel);
-        input.value = "";
-      }
-    }
-
     const map = L.map('mapa').setView([20, 0], 2);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; OpenStreetMap contributors'
@@ -369,13 +285,13 @@
         const marker = L.marker(p.coords).addTo(map).bindPopup(<strong>${p.nombre}</strong><br>Fecha: ${p.tiempo});
         markers.push(marker);
         coordsLinea.push(p.coords);
-        document.getElementById("tablaEventos").innerHTML += 
+        document.getElementById("tablaEventos").innerHTML += `
           <tr>
             <td>${p.nombre}</td>
             <td>${p.tiempo}</td>
             <td>-</td>
           </tr>
-        ;
+        `;
       });
 
       polyline = L.polyline(coordsLinea, { color: 'blue' }).addTo(map);
