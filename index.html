@@ -357,7 +357,8 @@
             historico.push({ bl, fecha: new Date().toISOString() });
             localStorage.setItem("busquedas", JSON.stringify(historico));
 
-            document.getElementById("tablaEventos").innerHTML = "";
+            const tablaEventos = document.getElementById("tablaEventos");
+            tablaEventos.innerHTML = "";
             markers.forEach(m => map.removeLayer(m));
             markers = [];
             if (polyline) map.removeLayer(polyline);
@@ -367,7 +368,7 @@
                 rutaEspecial = [
                     { nombre: "Qingdao, CN - Exportación cargada", coords: [36.0671, 120.3826], tiempo: "17 de febrero de 2025" },
                     { nombre: "Busan, KR - Transbordo", coords: [35.1796, 129.0756], tiempo: "22-23 de febrero de 2025" },
-                    { nombre: "Buenaventura, CO - Dado de alta", coords: [3.8801, -77.031], tiempo: "25 de marzo de 202025" }
+                    { nombre: "Buenaventura, CO - Dado de alta", coords: [3.8801, -77.0312], tiempo: "25 de marzo de 2025" }
                 ];
             } else if (bl === "250339340") {
                 rutaEspecial = [
@@ -387,17 +388,24 @@
                 const marker = L.marker(p.coords).addTo(map).bindPopup(`<strong>${p.nombre}</strong><br>Fecha: ${p.tiempo}`);
                 markers.push(marker);
                 coordsLinea.push(p.coords);
-                document.getElementById("tablaEventos").innerHTML += `
-                    <tr>
-                        <td>${p.nombre}</td>
-                        <td>${p.tiempo}</td>
-                        <td>-</td>
-                    </tr>
-                `;
+
+                // Crear filas de la tabla
+                let row = tablaEventos.insertRow();
+                let cell1 = row.insertCell(0);
+                let cell2 = row.insertCell(1);
+                let cell3 = row.insertCell(2);
+
+                cell1.innerHTML = p.nombre;
+                cell2.innerHTML = p.tiempo;
+                cell3.innerHTML = "-";
             });
 
-            polyline = L.polyline(coordsLinea, { color: 'blue' }).addTo(map);
-            map.fitBounds(polyline.getBounds());
+            if (coordsLinea.length > 1) { // Asegurarse de que haya al menos dos puntos para dibujar la línea
+                polyline = L.polyline(coordsLinea, { color: 'blue' }).addTo(map);
+                map.fitBounds(polyline.getBounds());
+            } else if (coordsLinea.length === 1) {
+              map.setView(coordsLinea[0], 5); // Centrar el mapa en el único punto
+            }
 
             cargas++;
             actualizarEstadisticas(); // Actualizar las estadísticas al buscar un BL
