@@ -31,7 +31,62 @@
         #panelEstadisticas.activo { display:block; opacity:1; transform:translateY(0) }
         #panelEstadisticas .cerrar-panel { background:none; border:none; font-size:20px; position:absolute; top:8px; right:10px; cursor:pointer; color:#888 }
         #panelEstadisticas .cerrar-panel:hover { color:#333 }
-        .chatbot-button { position:fixed; bottom:70px; right:85px; background:#0077cc; color:#fff; border:none; border-radius:50%; width:60px; height:60px; font-size:24px; box-shadow:0 0 10px rgba(0,0,0,0.3); cursor:pointer; z-index:998 }
+
+        /* Chatbot flotante */
+        .chatbot-button { position:fixed; bottom:20px; right:100px; background:#0077cc; color:#fff; border:none; border-radius:50%; width:60px; height:60px; font-size:24px; cursor:pointer; box-shadow:0 4px 8px rgba(0,0,0,0.3); z-index:1000; transition:0.3s }
+        .chatbot-button:hover { background:#005fa3; transform:scale(1.1) }
+
+        #chatWindow {
+            position:fixed;
+            bottom:90px;
+            right:100px;
+            width:300px;
+            max-height:400px;
+            background:#fff;
+            border-radius:8px;
+            box-shadow:0 4px 12px rgba(0,0,0,0.2);
+            display:none;
+            flex-direction:column;
+            overflow:hidden;
+            z-index:1000;
+        }
+        #chatHeader {
+            background:#003366;
+            color:#fff;
+            padding:10px;
+            font-weight:bold;
+        }
+        #chatBody {
+            flex:1;
+            padding:10px;
+            overflow-y:auto;
+            background:#f9f9f9;
+        }
+        .chat-message {
+            margin:5px 0;
+            padding:8px;
+            border-radius:4px;
+            max-width:80%;
+        }
+        .chat-user { background:#d1e7fd; align-self:flex-end; }
+        .chat-bot  { background:#e5e5e5; align-self:flex-start; }
+        #chatInputContainer {
+            display:flex;
+            border-top:1px solid #ddd;
+        }
+        #chatInput {
+            flex:1;
+            border:none;
+            padding:10px;
+            outline:none;
+        }
+        #chatSend {
+            background:#003366;
+            color:#fff;
+            border:none;
+            padding:0 16px;
+            cursor:pointer;
+        }
     </style>
 </head>
 <body>
@@ -51,13 +106,11 @@
         <a href="#cuenta">Mi Cuenta</a>
     </nav>
 
-    <!-- Inicio -->
     <div id="inicio" class="contenedor">
         <input type="text" id="blInput" placeholder="Ingrese su número de BL" required>
         <button onclick="buscarBLPrincipal()">Buscar</button>
     </div>
 
-    <!-- Búsqueda de BL secundaria -->
     <div id="busqueda" class="contenedor seccion-oculta">
         <h2>Buscar conocimiento de embarque (BL)</h2>
         <form onsubmit="return buscarBLSecundario();">
@@ -67,16 +120,13 @@
         <div id="resultContainer">Introduce un número BL para ver resultados aquí.</div>
     </div>
 
-    <!-- Mapa -->
     <div id="mapa"></div>
 
-    <!-- Tabla de eventos BL -->
     <table>
         <thead><tr><th>Puerto / Evento</th><th>Fecha / Tránsito</th><th>Detalle</th></tr></thead>
         <tbody id="tablaEventos"></tbody>
     </table>
 
-    <!-- Simulador dinámico -->
     <div id="simulador" class="contenedor seccion-oculta">
         <h2>Simulador de carga dinámico</h2>
         <form onsubmit="simularCarga(); return false;">
@@ -88,7 +138,6 @@
         <div id="simuladorResultado"></div>
     </div>
 
-    <!-- Área de Usuario -->
     <div id="usuario" class="contenedor seccion-oculta">
         <h2>Área de Usuario</h2>
         <form onsubmit="iniciarSesion(); return false;">
@@ -99,7 +148,6 @@
         <div id="usuarioMensaje"></div>
     </div>
 
-    <!-- Contacto -->
     <div id="contacto" class="formulario-contacto seccion-oculta">
         <h2>Contacto</h2>
         <form onsubmit="enviarFormularioPrincipal(event);">
@@ -111,19 +159,16 @@
         <p>O escríbenos a <strong>soporte@shiptrack.com</strong> o por <a href="https://wa.me/1234567890" target="_blank">WhatsApp</a></p>
     </div>
 
-    <!-- Ayuda -->
     <div id="ayuda" class="contenedor seccion-oculta">
         <h2>Ayuda</h2>
         <p>Preguntas frecuentes e información de uso.</p>
     </div>
 
-    <!-- Mi Cuenta -->
     <div id="cuenta" class="contenedor seccion-oculta">
         <h2>Mi Cuenta</h2>
         <p>Funcionalidad futura: guarda BL, notificaciones, etc.</p>
     </div>
 
-    <!-- Panel de estadísticas -->
     <div id="panelEstadisticas">
         <button class="cerrar-panel" onclick="togglePanel()">&times;</button>
         <h3><i class="fas fa-chart-bar"></i> Estadísticas</h3>
@@ -133,9 +178,17 @@
         <p>Tiempo promedio tránsito: <span id="promedioTransitoPanel">-</span></p>
     </div>
 
-    <!-- Botones flotantes -->
     <button class="boton-flotante" onclick="togglePanel()"><i class="fas fa-chart-bar"></i></button>
-    <button class="chatbot-button" onclick="alert('¿En qué puedo ayudarte?')"><i class="fas fa-robot"></i></button>
+    <button class="chatbot-button" onclick="toggleChat()"><i class="fas fa-robot"></i></button>
+
+    <div id="chatWindow">
+        <div id="chatHeader">Chat con Shiptrack</div>
+        <div id="chatBody"></div>
+        <div id="chatInputContainer">
+            <input type="text" id="chatInput" placeholder="Escribe tu mensaje..." />
+            <button id="chatSend">Enviar</button>
+        </div>
+    </div>
 
     <footer>
         &copy; 2025 Shiptrack | Desarrollado por Juan Giraldo y Dylan Díaz.
@@ -150,18 +203,15 @@
 
         let polyline, markers = [], cargas = 0;
 
-        // Funciones de BL
+        // Búsqueda de BL
         function buscarBLPrincipal() {
             const bl = document.getElementById("blInput").value.trim();
             if (!bl || bl.length < 6) return alert("Por favor ingresa un BL válido (mínimo 6 caracteres).");
-
-            // Limpiar mapa y tabla
             document.getElementById("tablaEventos").innerHTML = "";
             markers.forEach(m => map.removeLayer(m));
             if (polyline) map.removeLayer(polyline);
             markers = [];
 
-            // Datos simulados
             let ruta = [];
             if (bl === "MEDUQT871264") {
                 ruta = [
@@ -179,7 +229,6 @@
                 return alert("BL no reconocido.");
             }
 
-            // Dibujar marcadores y línea
             const coords = [];
             ruta.forEach(p => {
                 const m = L.marker(p.coords).addTo(map).bindPopup(`<strong>${p.nombre}</strong><br>${p.tiempo}`);
@@ -207,19 +256,16 @@
             return false;
         }
 
-        // Geocoding y distancia
+        // Geocoding y Haversine
         async function geocode(place) {
             const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(place)}`);
             const data = await res.json();
             if (!data.length) throw new Error('Ubicación no encontrada: ' + place);
             return [parseFloat(data[0].lat), parseFloat(data[0].lon)];
         }
-
         function haversine([lat1,lon1],[lat2,lon2]) {
-            const R=6371;
-            const dLat=(lat2-lat1)*Math.PI/180;
-            const dLon=(lon2-lon1)*Math.PI/180;
-            const a=Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
+            const R=6371, dLat=(lat2-lat1)*Math.PI/180, dLon=(lon2-lon1)*Math.PI/180;
+            const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
             return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
         }
 
@@ -229,32 +275,23 @@
             const destino = document.getElementById("destino").value.trim();
             const peso = parseFloat(document.getElementById("peso").value);
             const resDiv = document.getElementById("simuladorResultado");
-            resDiv.textContent = 'Calculando...';
-
             if (!origen||!destino||isNaN(peso)||peso<=0) {
                 return void(resDiv.textContent = 'Por favor ingresa datos válidos.');
             }
-
+            resDiv.textContent = 'Calculando…';
             try {
-                const coord1 = await geocode(origen);
-                const coord2 = await geocode(destino);
-                const distKm = haversine(coord1, coord2).toFixed(1);
-
-                // Limpiar ruta previa
+                const c1 = await geocode(origen), c2 = await geocode(destino);
+                const distKm = haversine(c1, c2).toFixed(1);
                 if (polyline) map.removeLayer(polyline);
                 markers.forEach(m => map.removeLayer(m));
                 markers = [];
-
-                // Dibujar nueva
-                markers.push(L.marker(coord1).addTo(map).bindPopup(origen));
-                markers.push(L.marker(coord2).addTo(map).bindPopup(destino));
-                polyline = L.polyline([coord1, coord2], { color: 'green' }).addTo(map);
+                markers.push(L.marker(c1).addTo(map).bindPopup(origen));
+                markers.push(L.marker(c2).addTo(map).bindPopup(destino));
+                polyline = L.polyline([c1, c2], { color: 'green' }).addTo(map);
                 map.fitBounds(polyline.getBounds(), { padding: [50,50] });
 
-                // Costo: 0.002 USD por kg·km
                 const rate = 0.002;
                 const costo = (distKm * peso * rate).toFixed(2);
-
                 resDiv.innerHTML = `
                     <h3>Resultado de simulación</h3>
                     <ul>
@@ -270,14 +307,13 @@
             }
         }
 
-        // Sesión y contacto
+        // Usuario y contacto
         function iniciarSesion() {
             const u = document.getElementById("usuarioNombre").value;
             const p = document.getElementById("usuarioClave").value;
             document.getElementById("usuarioMensaje").textContent =
                 (u==='admin'&&p==='1234')? 'Inicio exitoso.' : 'Usuario o contraseña incorrecta.';
         }
-
         function enviarFormularioPrincipal(e) {
             e.preventDefault();
             const n = document.getElementById("nombre").value;
@@ -285,11 +321,10 @@
             e.target.reset();
         }
 
-        // Panel de estadísticas
+        // Estadísticas
         function togglePanel() {
             document.getElementById("panelEstadisticas").classList.toggle("activo");
         }
-
         function actualizarEstadisticas() {
             document.getElementById("totalCargasPanel").textContent = cargas;
             const ul = document.getElementById("rutasComunesPanel");
@@ -300,23 +335,20 @@
             });
             document.getElementById("promedioTransitoPanel").textContent = '25–35 días';
         }
-
-        // Cerrar panel al clicar fuera
-        document.addEventListener('click', e=>{
+        document.addEventListener('click', e => {
             const panel = document.getElementById("panelEstadisticas");
             const btn = document.querySelector(".boton-flotante");
-            if (panel.classList.contains("activo")
-                && !panel.contains(e.target)
-                && !btn.contains(e.target)
-            ) panel.classList.remove("activo");
+            if (panel.classList.contains("activo") && !panel.contains(e.target) && !btn.contains(e.target)) {
+                panel.classList.remove("activo");
+            }
         });
 
-        // Navegación de secciones
-        document.querySelectorAll('nav a').forEach(link=>{
-            link.addEventListener('click', e=>{
+        // Navegación
+        document.querySelectorAll('nav a').forEach(link => {
+            link.addEventListener('click', e => {
                 e.preventDefault();
                 document.querySelectorAll('.contenedor, .formulario-contacto')
-                    .forEach(sec=>sec.classList.add('seccion-oculta'));
+                    .forEach(sec => sec.classList.add('seccion-oculta'));
                 const id = link.getAttribute('href').substring(1);
                 const sec = document.getElementById(id);
                 if (sec) {
@@ -326,8 +358,49 @@
             });
         });
 
-        // Inicializa estadísticas
+        // Chatbot
+        const chatWindow = document.getElementById('chatWindow');
+        const chatBody   = document.getElementById('chatBody');
+        const chatInput  = document.getElementById('chatInput');
+        const chatSend   = document.getElementById('chatSend');
+
+        function toggleChat() {
+            const d = chatWindow.style.display;
+            chatWindow.style.display = (d === 'flex' ? 'none' : 'flex');
+            if (chatWindow.style.display === 'flex') {
+                chatBody.scrollTop = chatBody.scrollHeight;
+            }
+        }
+
+        function appendMessage(text, sender) {
+            const msg = document.createElement('div');
+            msg.classList.add('chat-message', sender === 'user' ? 'chat-user' : 'chat-bot');
+            msg.textContent = text;
+            chatBody.appendChild(msg);
+            chatBody.scrollTop = chatBody.scrollHeight;
+        }
+
+        chatSend.addEventListener('click', () => {
+            const text = chatInput.value.trim();
+            if (!text) return;
+            appendMessage(text, 'user');
+            chatInput.value = '';
+            setTimeout(() => {
+                let resp = 'Lo siento, no entiendo. ¿Puedes reformular?';
+                if (/hola|buenos/i.test(text)) resp = '¡Hola! ¿En qué puedo ayudarte?';
+                else if (/ruta|simulador/i.test(text)) resp = 'Usa la pestaña Simulador: ingresa origen, destino y peso.';
+                else if (/contacto|soporte/i.test(text)) resp = 'Contáctanos en soporte@shiptrack.com o por WhatsApp en Contacto.';
+                appendMessage(resp, 'bot');
+            }, 500);
+        });
+
+        chatInput.addEventListener('keydown', e => {
+            if (e.key === 'Enter') { e.preventDefault(); chatSend.click(); }
+        });
+
+        // Inicialización
         actualizarEstadisticas();
     </script>
 </body>
 </html>
+
