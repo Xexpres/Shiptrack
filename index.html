@@ -8,229 +8,32 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous"/>
     <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/1063/1063191.png" />
     <style>
-        /* --- Estilos generales (fusionados de ambos códigos) --- */
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4; /* Tomado del primer código */
-        }
-
-        header {
-            background-color: #003366; /* Tomado del primer código */
-            color: white;
-            padding: 15px; /* Tomado del primer código */
-            text-align: center;
-        }
-
-        nav {
-            background-color: #002244; /* Tomado del primer código */
-            padding: 10px; /* Tomado del primer código */
-            display: flex;
-            justify-content: center;
-            gap: 20px; /* Tomado del primer código */
-        }
-
-        nav a {
-            color: white;
-            text-decoration: none;
-            font-weight: bold; /* Tomado del primer código */
-        }
-
-        nav a:hover {
-            text-decoration: underline; /* Tomado del primer código */
-        }
-
-        .contenedor {
-            max-width: 1000px; /* Tomado del primer código */
-            margin: 20px auto; /* Tomado del primer código */
-            background-color: white; /* Tomado del primer código */
-            padding: 20px; /* Tomado del primer código */
-            border-radius: 8px; /* Tomado del primer código */
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Tomado del primer código */
-            text-align: center; /* Tomado del primer código */
-        }
-
-        input, button, textarea {
-            width: 100%; /* Tomado del primer código */
-            padding: 10px; /* Tomado del primer código */
-            margin: 10px 0; /* Tomado del primer código */
-            border: 1px solid #ddd; /* Tomado del primer código */
-            border-radius: 4px; /* Tomado del primer código */
-        }
-
-        button {
-            background-color: #003366; /* Tomado del primer código */
-            color: white;
-            border: none; /* Tomado del primer código */
-            cursor: pointer; /* Tomado del primer código */
-        }
-
-        button:hover {
-            background-color: #002244; /* Tomado del primer código */
-        }
-
-        #mapa {
-            margin: 20px auto; /* Tomado del primer código */
-            width: 90%; /* Tomado del primer código */
-            height: 500px; /* Tomado del primer código */
-        }
-
-        table {
-            width: 90%; /* Tomado del primer código */
-            margin: 20px auto; /* Tomado del primer código */
-            background-color: white; /* Tomado del primer código */
-            border-collapse: collapse; /* Tomado del primer código */
-        }
-
-        th, td {
-            border: 1px solid #ddd; /* Tomado del primer código */
-            padding: 8px; /* Tomado del primer código */
-        }
-
-        th {
-            background-color: #003366; /* Tomado del primer código */
-            color: white;
-        }
-
-        footer {
-            text-align: center; /* Tomado del primer código */
-            padding: 10px; /* Tomado del primer código */
-            background-color: #003366; /* Tomado del primer código */
-            color: white; /* Tomado del primer código */
-            margin-top: 30px; /* Tomado del primer código */
-        }
-
-        .seccion-oculta {
-            display: none; /* Tomado del primer código */
-        }
-
-        .formulario-contacto {
-            background-color: #ffffff; /* Tomado del primer código */
-            padding: 20px; /* Tomado del primer código */
-            margin: 30px auto; /* Tomado del primer código */
-            border-radius: 8px; /* Tomado del primer código */
-            max-width: 600px; /* Tomado del primer código */
-        }
-
-        .boton-flotante {
-            position: fixed; /* Tomado del primer código */
-            bottom: 20px; /* Tomado del primer código */
-            right: 20px; /* Tomado del primer código */
-            background-color: #003366; /* Tomado del primer código */
-            color: white; /* Tomado del primer código */
-            border: none; /* Tomado del primer código */
-            border-radius: 50%; /* Tomado del primer código */
-            width: 60px; /* Tomado del primer código */
-            height: 60px; /* Tomado del primer código */
-            font-size: 24px; /* Tomado del primer código */
-            cursor: pointer; /* Tomado del primer código */
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3); /* Tomado del primer código */
-            z-index: 1000; /* Tomado del primer código */
-            transition: background-color 0.3s ease, transform 0.2s ease; /* Tomado del primer código */
-        }
-
-        .boton-flotante:hover {
-            background-color: #005599; /* Tomado del primer código */
-            transform: scale(1.1); /* Tomado del primer código */
-        }
-
-        .panel-estadisticas {
-            position: fixed; /* Tomado del primer código */
-            bottom: 90px; /* Tomado del primer código */
-            right: 20px; /* Tomado del primer código */
-            width: 320px; /* Tomado del primer código */
-            background-color: white; /* Tomado del primer código */
-            border-radius: 10px; /* Tomado del primer código */
-            padding: 15px; /* Tomado del primer código */
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2); /* Tomado del primer código */
-            display: none; /* Tomado del primer código */
-            z-index: 999; /* Tomado del primer código */
-            opacity: 0; /* Tomado del primer código */
-            transform: translateY(10px); /* Tomado del primer código */
-            transition: all 0.3s ease; /* Tomado del primer código */
-        }
-
-        .panel-estadisticas.activo {
-            display: block; /* Tomado del primer código */
-            opacity: 1; /* Tomado del primer código */
-            transform: translateY(0); /* Tomado del primer código */
-        }
-
-        .cerrar-panel {
-            background: none; /* Tomado del primer código */
-            border: none; /* Tomado del primer código */
-            font-size: 20px; /* Tomado del primer código */
-            position: absolute; /* Tomado del primer código */
-            top: 8px; /* Tomado del primer código */
-            right: 10px; /* Tomado del primer código */
-            cursor: pointer; /* Tomado del primer código */
-            color: #888; /* Tomado del primer código */
-        }
-
-        .cerrar-panel:hover {
-            color: #333; /* Tomado del primer código */
-        }
-
-        /* --- Estilos del segundo código (adaptados para evitar conflictos) --- */
-        .map-container {
-            height: 400px;
-            background: #e0e0e0;
-            margin-top: 1rem;
-        }
-
-        .stat-item {
-            margin-bottom: 0.5rem;
-        }
-
-        .chatbot-button {
-            position: fixed;
-            bottom: 70px; /* Ajustado para no superponerse con el panel de estadísticas */
-            right: 85px; /* Ajustado para no superponerse con el panel de estadísticas */
-            background: #0077cc;
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 60px;
-            height: 60px;
-            font-size: 24px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.3);
-            cursor: pointer;
-            z-index: 998; /* Un poco menos que el panel de estadísticas */
-        }
-
-        #resultContainer {
-            background: #fff;
-            padding: 1rem;
-            margin-top: 1rem;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-        }
-
-        #simuladorResultado {
-            background: #f9f9f9;
-            padding: 1rem;
-            margin-top: 1rem;
-            border-radius: 5px;
-            border: 1px solid #eee;
-        }
-
-        #usuarioMensaje {
-            background: #f9f9f9;
-            padding: 1rem;
-            margin-top: 1rem;
-            border-radius: 5px; 
-            border: 1px solid #eee;
-        }
-
-        #contactoConfirmacion {
-            background: #e6ffe6;
-            color: #006400;
-            padding: 1rem;
-            margin-top: 1rem;
-            border-radius: 5px;
-            border: 1px solid #b3ffb3;
-        }
+        /* --- Estilos generales --- */
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4; }
+        header { background-color: #003366; color: white; padding: 15px; text-align: center; }
+        nav { background-color: #002244; padding: 10px; display: flex; justify-content: center; gap: 20px; }
+        nav a { color: white; text-decoration: none; font-weight: bold; }
+        nav a:hover { text-decoration: underline; }
+        .contenedor { max-width: 1000px; margin: 20px auto; background-color: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); text-align: center; }
+        input, button, textarea { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px; }
+        button { background-color: #003366; color: white; border: none; cursor: pointer; }
+        button:hover { background-color: #002244; }
+        #mapa { margin: 20px auto; width: 90%; height: 500px; }
+        table { width: 90%; margin: 20px auto; background-color: white; border-collapse: collapse; }
+        th, td { border: 1px solid #ddd; padding: 8px; }
+        th { background-color: #003366; color: white; }
+        footer { text-align: center; padding: 10px; background-color: #003366; color: white; margin-top: 30px; }
+        .seccion-oculta { display: none; }
+        .formulario-contacto { background-color: #ffffff; padding: 20px; margin: 30px auto; border-radius: 8px; max-width: 600px; }
+        .boton-flotante { position: fixed; bottom: 20px; right: 20px; background-color: #003366; color: white; border: none; border-radius: 50%; width: 60px; height: 60px; font-size: 24px; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.3); z-index: 1000; transition: background-color 0.3s ease, transform 0.2s ease; }
+        .boton-flotante:hover { background-color: #005599; transform: scale(1.1); }
+        .panel-estadisticas { position: fixed; bottom: 90px; right: 20px; width: 320px; background-color: white; border-radius: 10px; padding: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); display: none; z-index: 999; opacity: 0; transform: translateY(10px); transition: all 0.3s ease; }
+        .panel-estadisticas.activo { display: block; opacity: 1; transform: translateY(0); }
+        .cerrar-panel { background: none; border: none; font-size: 20px; position: absolute; top: 8px; right: 10px; cursor: pointer; color: #888; }
+        .cerrar-panel:hover { color: #333; }
+        /* Segundo código adaptado */
+        .chatbot-button { position: fixed; bottom: 70px; right: 85px; background: #0077cc; color: white; border: none; border-radius: 50%; width: 60px; height: 60px; font-size: 24px; box-shadow: 0 0 10px rgba(0,0,0,0.3); cursor: pointer; z-index: 998; }
+        #resultContainer, #simuladorResultado, #usuarioMensaje, #contactoConfirmacion { background: #f9f9f9; padding: 1rem; margin-top: 1rem; border-radius: 5px; border: 1px solid #eee; }
     </style>
 </head>
 <body>
@@ -238,7 +41,6 @@
         <h1>Shiptrack - Seguimiento de Carga</h1>
         <p>Seguimiento de carga marítima en tiempo real</p>
     </header>
-
     <nav>
         <a href="#inicio">Inicio</a>
         <a href="#busqueda">BL</a>
@@ -249,12 +51,10 @@
         <a href="#ayuda">Ayuda</a>
         <a href="#cuenta">Mi Cuenta</a>
     </nav>
-
     <div id="inicio" class="contenedor">
         <input type="text" id="blInput" placeholder="Ingrese su número de conocimiento de embarque (BL)" required>
         <button onclick="buscarBLPrincipal()">Buscar</button>
     </div>
-
     <div id="busqueda" class="contenedor seccion-oculta">
         <h2>Buscar conocimiento de embarque (BL)</h2>
         <form onsubmit="buscarBLSecundario(); return false;">
@@ -263,25 +63,17 @@
         </form>
         <div id="resultContainer">Introduce un número BL para ver resultados aquí.</div>
     </div>
-
     <div id="mapa"></div>
-
     <table>
         <thead>
-            <tr>
-                <th>Puerto</th>
-                <th>Evento / Tiempo de tránsito</th>
-                <th>Fecha (si aplica)</th>
-            </tr>
+            <tr><th>Puerto</th><th>Evento / Tiempo de tránsito</th><th>Fecha (si aplica)</th></tr>
         </thead>
         <tbody id="tablaEventos"></tbody>
     </table>
-
     <div id="cuenta" class="contenedor seccion-oculta">
         <h2>Mi Cuenta</h2>
-        <p>Funcionalidad futura: aquí podrás guardar tus BL, recibir notificaciones y personalizar tu experiencia.</p>
+        <p>Aquí podrás guardar tus BL, recibir notificaciones y personalizar tu experiencia.</p>
     </div>
-
     <div id="simulador" class="contenedor seccion-oculta">
         <h2>Simulador de carga</h2>
         <form onsubmit="simularCarga(); return false;">
@@ -292,7 +84,6 @@
         </form>
         <div id="simuladorResultado"></div>
     </div>
-
     <div id="usuario" class="contenedor seccion-oculta">
         <h2>Área de Usuario</h2>
         <form onsubmit="iniciarSesion(); return false;">
@@ -302,7 +93,6 @@
         </form>
         <div id="usuarioMensaje"></div>
     </div>
-
     <div id="contacto" class="formulario-contacto">
         <h2>Contacto</h2>
         <form onsubmit="enviarFormularioPrincipal(event)">
@@ -313,65 +103,48 @@
         </form>
         <p>También puedes escribirnos a <strong>soporte@shiptrack.com</strong> o por <a href="https://wa.me/1234567890" target="_blank">WhatsApp</a></p>
     </div>
-
     <div id="ayuda" class="contenedor seccion-oculta">
         <h2>Ayuda</h2>
         <p>Aquí encontrarás información útil y preguntas frecuentes sobre Shiptrack.</p>
     </div>
-
-    <div class="stats-panel">
+    <div id="panelEstadisticas" class="panel-estadisticas">
+        <button class="cerrar-panel" onclick="togglePanel()">&times;</button>
         <h3><i class="fas fa-chart-bar"></i> Estadísticas</h3>
         <div class="stat-item">Cargas rastreadas: <span id="totalCargasPanel">0</span></div>
         <div class="stat-item">Rutas comunes: <ul id="rutasComunesPanel"></ul></div>
         <div class="stat-item">Tiempo promedio tránsito: <span id="promedioTransitoPanel">-</span></div>
     </div>
-
-    <button class="boton-flotante" onclick="togglePanel()">
-        <i class="fas fa-chart-bar"></i>
-    </button>
-
-    <button class="chatbot-button" onclick="alert('¿En qué puedo ayudarte?')">
-        <i class="fas fa-robot"></i>
-    </button>
-
-    <footer>
-        &copy; Seguimiento de barcos 2025 | Desarrollado por Juan Giraldo y Dylan Díaz.
-    </footer>
+    <button class="boton-flotante" onclick="togglePanel()"><i class="fas fa-chart-bar"></i></button>
+    <button class="chatbot-button" onclick="alert('¿En qué puedo ayudarte?')"><i class="fas fa-robot"></i></button>
+    <footer>&copy; Seguimiento de barcos 2025 | Desarrollado por Juan Giraldo y Dylan Díaz.</footer>
 
     <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
     <script>
         const map = L.map('mapa').setView([20, 0], 2);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; OpenStreetMap contributors'
-        }).addTo(map);
-
-        let polyline;
-        let markers = [];
-        let cargas = 0;
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap contributors' }).addTo(map);
+        let polyline, markers = [], cargas = 0;
 
         function buscarBLPrincipal() {
             const bl = document.getElementById("blInput").value.trim();
             if (!bl || bl.length < 6) return alert("Por favor ingrese un número de BL válido (mínimo 6 caracteres).");
-
             let historico = JSON.parse(localStorage.getItem("busquedas")) || [];
             historico.push({ bl, fecha: new Date().toISOString() });
             localStorage.setItem("busquedas", JSON.stringify(historico));
 
-            const tablaEventos = document.getElementById("tablaEventos");
-            tablaEventos.innerHTML = "";
-            markers.forEach(m => map.removeLayer(m));
-            markers = [];
+            const tabla = document.getElementById("tablaEventos");
+            tabla.innerHTML = "";
+            markers.forEach(m => map.removeLayer(m)); markers = [];
             if (polyline) map.removeLayer(polyline);
 
-            let rutaEspecial = [];
+            let ruta = [];
             if (bl === "MEDUQT871264") {
-                rutaEspecial = [
+                ruta = [
                     { nombre: "Qingdao, CN - Exportación cargada", coords: [36.0671, 120.3826], tiempo: "17 de febrero de 2025" },
                     { nombre: "Busan, KR - Transbordo", coords: [35.1796, 129.0756], tiempo: "22-23 de febrero de 2025" },
                     { nombre: "Buenaventura, CO - Dado de alta", coords: [3.8801, -77.0312], tiempo: "25 de marzo de 2025" }
                 ];
             } else if (bl === "250339340") {
-                rutaEspecial = [
+                ruta = [
                     { nombre: "Shanghai, CN - Puerta vacía", coords: [31.2304, 121.4737], tiempo: "24 feb 2025 17:41" },
                     { nombre: "Shanghai, CN - Carga", coords: [31.2304, 121.4737], tiempo: "26 feb - 5 mar 2025" },
                     { nombre: "Shanghai, CN - Salida del buque", coords: [31.2304, 121.4737], tiempo: "6 mar 2025 04:30" },
@@ -383,20 +156,23 @@
                 return alert("Número de BL no reconocido.");
             }
 
-            const coordsLinea = [];
-            rutaEspecial.forEach(p => {
-                const marker = L.marker(p.coords).addTo(map).bindPopup(<strong>${p.nombre}</strong><br>Fecha: ${p.tiempo}); markers.push(marker); coordsLinea.push(p.coords);
-                let row = tablaEventos.insertRow();
-                row.insertCell(0).innerHTML = p.nombre;
-                row.insertCell(1).innerHTML = p.tiempo;
-                row.insertCell(2).innerHTML = "-";
+            const coords = [];
+            ruta.forEach(p => {
+                const marker = L.marker(p.coords).addTo(map)
+                    .bindPopup(`<strong>${p.nombre}</strong><br>Fecha: ${p.tiempo}`);
+                markers.push(marker);
+                coords.push(p.coords);
+                const row = tabla.insertRow();
+                row.insertCell(0).innerText = p.nombre;
+                row.insertCell(1).innerText = p.tiempo;
+                row.insertCell(2).innerText = "-";
             });
 
-            if (coordsLinea.length > 1) {
-                polyline = L.polyline(coordsLinea, { color: 'blue' }).addTo(map);
+            if (coords.length > 1) {
+                polyline = L.polyline(coords, { color: 'blue' }).addTo(map);
                 map.fitBounds(polyline.getBounds());
-            } else if (coordsLinea.length === 1) {
-                map.setView(coordsLinea[0], 5);
+            } else if (coords.length === 1) {
+                map.setView(coords[0], 5);
             }
 
             cargas++;
@@ -406,103 +182,93 @@
         function buscarBLSecundario() {
             const bl = document.getElementById("blNumber").value;
             const cont = document.getElementById("resultContainer");
-            cont.innerHTML = Buscando información para BL <strong>${bl}</strong>...;
+            cont.innerHTML = `Buscando información para BL <strong>${bl}</strong>...`;
             setTimeout(() => { cont.innerHTML += "<br>Resultado simulado: carga en tránsito, ETA 7 días."; }, 1000);
         }
 
-        // —— Aquí reemplazamos SOLO ESTA FUNCIÓN ——
         function simularCarga() {
             const origen = document.getElementById("origen").value;
             const destino = document.getElementById("destino").value;
             const peso = parseFloat(document.getElementById("peso").value);
             const res = document.getElementById("simuladorResultado");
-
-            const claveRuta = ${origen.trim().toLowerCase()}-${destino.trim().toLowerCase()};
-
+            const claveRuta = `${origen.trim().toLowerCase()}-${destino.trim().toLowerCase()}`;
             const tarifas = {
                 "shanghai-buenaventura": 0.45,
                 "qingdao-busan-buenaventura": 0.50,
                 "busan-buenaventura": 0.42,
                 "shanghai-singapur": 0.30
             };
-
             const tarifa = tarifas[claveRuta];
 
             if (!origen || !destino || isNaN(peso) || peso <= 0) {
                 res.innerHTML = "Por favor ingrese datos válidos.";
                 return;
             }
-
             if (!tarifa) {
-                res.innerHTML = Ruta de ${origen} a ${destino} no registrada.<br>Consulta con soporte para una cotización manual.;
+                res.innerHTML = `Ruta de ${origen} a ${destino} no registrada.<br>Consulta con soporte para una cotización manual.`;
                 return;
             }
 
             const tiempo = 12 + Math.floor(Math.random() * 5);
             const costo = peso * tarifa;
-
-            res.innerHTML = 
+            res.innerHTML = `
                 <strong>Resultado de simulación:</strong><br>
                 Ruta: <b>${origen} → ${destino}</b><br>
                 Peso: <b>${peso} kg</b><br>
                 Tarifa por kg: <b>$${tarifa.toFixed(2)} USD</b><br>
                 <u><b>Costo total estimado: $${costo.toFixed(2)} USD</b></u><br>
                 Tiempo estimado de tránsito: <b>${tiempo} días</b>
-            ;
+            `;
         }
-        // ———————————————————————————————
 
         function iniciarSesion() {
             const user = document.getElementById("usuarioNombre").value;
             const pass = document.getElementById("usuarioClave").value;
             const msg = document.getElementById("usuarioMensaje");
-            msg.innerHTML = (user==="admin"&&pass==="1234")?"Inicio de sesión exitoso.":"Usuario o contraseña incorrecta.";
+            msg.innerHTML = (user === "admin" && pass === "1234") ? "Inicio de sesión exitoso." : "Usuario o contraseña incorrecta.";
         }
 
         function enviarFormularioPrincipal(e) {
             e.preventDefault();
             const nombre = document.getElementById("nombre").value;
-            alert(Gracias por contactarnos, ${nombre}. Hemos recibido tu mensaje y te responderemos pronto.);
-            document.querySelector(".formulario-contacto form").reset();
+            alert(`Gracias por contactarnos, ${nombre}. Hemos recibido tu mensaje y te responderemos pronto.`);
+            document.querySelector("#contacto form").reset();
         }
 
         function togglePanel() {
             const panel = document.getElementById("panelEstadisticas");
             panel.classList.toggle("activo");
-            actualizarEstadisticasPanel();
+            actualizarEstadisticas();
         }
 
-        document.addEventListener("click", function(event) {
+        document.addEventListener("click", function(e) {
             const panel = document.getElementById("panelEstadisticas");
             const boton = document.querySelector(".boton-flotante");
-            if (panel.classList.contains("activo") && !panel.contains(event.target) && !boton.contains(event.target)) {
+            if (panel.classList.contains("activo") && !panel.contains(e.target) && !boton.contains(e.target)) {
                 panel.classList.remove("activo");
             }
         });
 
         function actualizarEstadisticas() {
             document.getElementById("totalCargasPanel").innerText = cargas;
-            const rutasComunesList = document.getElementById("rutasComunesPanel");
-            rutasComunesList.innerHTML = "";
-            ["Shanghai - Buenaventura","Qingdao - Busan - Buenaventura"].forEach(ruta=>{
-                const li=document.createElement("li");
-                li.innerText=ruta;
-                rutasComunesList.appendChild(li);
+            const rutasList = document.getElementById("rutasComunesPanel");
+            rutasList.innerHTML = "";
+            ["Shanghai - Buenaventura","Qingdao - Busan - Buenaventura"].forEach(r => {
+                const li = document.createElement("li"); li.innerText = r; rutasList.appendChild(li);
             });
             document.getElementById("promedioTransitoPanel").innerText = "25-35 días";
         }
 
-        document.querySelectorAll("nav a").forEach(link=>{
-            link.addEventListener("click",e=>{
+        document.querySelectorAll("nav a").forEach(link => {
+            link.addEventListener("click", e => {
                 e.preventDefault();
-                document.querySelectorAll(".contenedor").forEach(s=>s.classList.add("seccion-oculta"));
-                const seccion=document.getElementById(link.getAttribute("href").substring(1));
-                if(seccion)seccion.classList.remove("seccion-oculta");
-                window.scrollTo({top:seccion.offsetTop-50,behavior:"smooth"});
+                document.querySelectorAll(".contenedor").forEach(s => s.classList.add("seccion-oculta"));
+                const target = document.getElementById(link.getAttribute("href").substring(1));
+                if (target) { target.classList.remove("seccion-oculta"); window.scrollTo({ top: target.offsetTop-50, behavior: "smooth" }); }
             });
         });
 
-        // Inicializar estadísticas al cargar
+        // Inicializar
         actualizarEstadisticas();
     </script>
 </body>
