@@ -1,16 +1,12 @@
 document.addEventListener("DOMContentLoaded", () => {
-    // Agrega fecha al encabezado
-    const header = document.querySelector("header");
-    const now = new Date().toLocaleString("es-CO");
-    const timeInfo = document.createElement("p");
-    timeInfo.textContent = `Fecha actual: ${now}`;
-    header.appendChild(timeInfo);
+  // Mostrar fecha actual en el encabezado
+  const header = document.querySelector("header");
+  const p = document.createElement("p");
+  p.textContent = "Fecha actual: " + new Date().toLocaleDateString("es-CO");
+  header.appendChild(p);
 
-    // Mejora para el chatbot
-    const chatbot = document.querySelector(".chatbot-button");
-    if (chatbot) {
-        chatbot.addEventListener("click", () => {
-            alert("¿Necesitas ayuda?\n- ¿Qué es un BL?\n- ¿Cómo rastrear tu carga?\n- ¿Cómo usar el simulador?");
-        });
-    }
+  // Chatbot mejorado
+  document.querySelector(".chatbot-button").addEventListener("click", () => {
+    alert("¿En qué puedo ayudarte?\n- ¿Qué es un BL?\n- ¿Cómo rastrear tu carga?\n- ¿Cómo usar el simulador?");
+  });
 });
