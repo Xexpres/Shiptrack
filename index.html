@@ -219,7 +219,7 @@
             background: #f9f9f9;
             padding: 1rem;
             margin-top: 1rem;
-            border-radius: 5px;
+            border-radius: 5px; 
             border: 1px solid #eee;
         }
 
@@ -385,58 +385,78 @@
 
             const coordsLinea = [];
             rutaEspecial.forEach(p => {
-                const marker = L.marker(p.coords).addTo(map).bindPopup(`<strong>${p.nombre}</strong><br>Fecha: ${p.tiempo}`);
-                markers.push(marker);
-                coordsLinea.push(p.coords);
-
-                // Crear filas de la tabla
+                const marker = L.marker(p.coords).addTo(map).bindPopup(`<strong>${p.nombre}</strong><br>Fecha: ${p.tiempo}`); markers.push(marker); coordsLinea.push(p.coords);
                 let row = tablaEventos.insertRow();
-                let cell1 = row.insertCell(0);
-                let cell2 = row.insertCell(1);
-                let cell3 = row.insertCell(2);
-
-                cell1.innerHTML = p.nombre;
-                cell2.innerHTML = p.tiempo;
-                cell3.innerHTML = "-";
+                row.insertCell(0).innerHTML = p.nombre;
+                row.insertCell(1).innerHTML = p.tiempo;
+                row.insertCell(2).innerHTML = "-";
             });
 
-            if (coordsLinea.length > 1) { // Asegurarse de que haya al menos dos puntos para dibujar la línea
+            if (coordsLinea.length > 1) {
                 polyline = L.polyline(coordsLinea, { color: 'blue' }).addTo(map);
                 map.fitBounds(polyline.getBounds());
             } else if (coordsLinea.length === 1) {
-              map.setView(coordsLinea[0], 5); // Centrar el mapa en el único punto
+                map.setView(coordsLinea[0], 5);
             }
 
             cargas++;
-            actualizarEstadisticas(); // Actualizar las estadísticas al buscar un BL
+            actualizarEstadisticas();
         }
 
         function buscarBLSecundario() {
             const bl = document.getElementById("blNumber").value;
             const cont = document.getElementById("resultContainer");
             cont.innerHTML = `Buscando información para BL <strong>${bl}</strong>...`;
-            setTimeout(() => {
-                cont.innerHTML += "<br>Resultado simulado: carga en tránsito, ETA 7 días.";
-            }, 1000);
+            setTimeout(() => { cont.innerHTML += "<br>Resultado simulado: carga en tránsito, ETA 7 días."; }, 1000);
         }
 
+        // —— Aquí reemplazamos SOLO ESTA FUNCIÓN ——
         function simularCarga() {
             const origen = document.getElementById("origen").value;
             const destino = document.getElementById("destino").value;
-            const peso = document.getElementById("peso").value;
+            const peso = parseFloat(document.getElementById("peso").value);
             const res = document.getElementById("simuladorResultado");
-            res.innerHTML = `Simulación: De ${origen} a ${destino} con ${peso} kg.<br>Tiempo estimado: 12 días.`;
+
+            const claveRuta = `${origen.trim().toLowerCase()}-${destino.trim().toLowerCase()}`;
+
+            const tarifas = {
+                "shanghai-buenaventura": 0.45,
+                "qingdao-busan-buenaventura": 0.50,
+                "busan-buenaventura": 0.42,
+                "shanghai-singapur": 0.30
+            };
+
+            const tarifa = tarifas[claveRuta];
+
+            if (!origen || !destino || isNaN(peso) || peso <= 0) {
+                res.innerHTML = "Por favor ingrese datos válidos.";
+                return;
+            }
+
+            if (!tarifa) {
+                res.innerHTML = `Ruta de ${origen} a ${destino} no registrada.<br>Consulta con soporte para una cotización manual.`;
+                return;
+            }
+
+            const tiempo = 12 + Math.floor(Math.random() * 5);
+            const costo = peso * tarifa;
+
+            res.innerHTML = `
+                <strong>Resultado de simulación:</strong><br>
+                Ruta: <b>${origen} → ${destino}</b><br>
+                Peso: <b>${peso} kg</b><br>
+                Tarifa por kg: <b>$${tarifa.toFixed(2)} USD</b><br>
+                <u><b>Costo total estimado: $${costo.toFixed(2)} USD</b></u><br>
+                Tiempo estimado de tránsito: <b>${tiempo} días</b>
+            `;
         }
+        // ———————————————————————————————
 
         function iniciarSesion() {
             const user = document.getElementById("usuarioNombre").value;
             const pass = document.getElementById("usuarioClave").value;
             const msg = document.getElementById("usuarioMensaje");
-            if (user === "admin" && pass === "1234") {
-                msg.innerHTML = "Inicio de sesión exitoso.";
-            } else {
-                msg.innerHTML = "Usuario o contraseña incorrecta.";
-            }
+            msg.innerHTML = (user==="admin"&&pass==="1234")?"Inicio de sesión exitoso.":"Usuario o contraseña incorrecta.";
         }
 
         function enviarFormularioPrincipal(e) {
@@ -444,12 +464,6 @@
             const nombre = document.getElementById("nombre").value;
             alert(`Gracias por contactarnos, ${nombre}. Hemos recibido tu mensaje y te responderemos pronto.`);
             document.querySelector(".formulario-contacto form").reset();
-        }
-
-        function enviarMensaje() {
-            const nombre = document.getElementById("nombreContacto").value;
-            const confirm = document.getElementById("contactoConfirmacion");
-            confirm.innerHTML = `Gracias por tu mensaje, ${nombre}. Te responderemos pronto.`;
         }
 
         function togglePanel() {
@@ -466,34 +480,30 @@
             }
         });
 
-        function actualizarEstadisticasPanel() {
+        function actualizarEstadisticas() {
             document.getElementById("totalCargasPanel").innerText = cargas;
             const rutasComunesList = document.getElementById("rutasComunesPanel");
             rutasComunesList.innerHTML = "";
-            const rutas = ["Shanghai - Buenaventura", "Qingdao - Busan - Buenaventura"];
-            rutas.forEach(ruta => {
-                const li = document.createElement("li");
-                li.innerText = ruta;
+            ["Shanghai - Buenaventura","Qingdao - Busan - Buenaventura"].forEach(ruta=>{
+                const li=document.createElement("li");
+                li.innerText=ruta;
                 rutasComunesList.appendChild(li);
             });
             document.getElementById("promedioTransitoPanel").innerText = "25-35 días";
         }
 
-        document.querySelectorAll("nav a").forEach(link => {
-            link.addEventListener("click", e => {
+        document.querySelectorAll("nav a").forEach(link=>{
+            link.addEventListener("click",e=>{
                 e.preventDefault();
-                const id = link.getAttribute("href").substring(1);
-                document.querySelectorAll(".contenedor").forEach(s => s.classList.add("seccion-oculta"));
-                const seccion = document.getElementById(id);
-                if (seccion) seccion.classList.remove("seccion-oculta");
-                window.scrollTo({ top: seccion.offsetTop - 50, behavior: "smooth" });
+                document.querySelectorAll(".contenedor").forEach(s=>s.classList.add("seccion-oculta"));
+                const seccion=document.getElementById(link.getAttribute("href").substring(1));
+                if(seccion)seccion.classList.remove("seccion-oculta");
+                window.scrollTo({top:seccion.offsetTop-50,behavior:"smooth"});
             });
         });
 
-        // Inicializar las estadísticas del panel
-        actualizarEstadisticasPanel();
+        // Inicializar estadísticas al cargar
+        actualizarEstadisticas();
     </script>
 </body>
 </html>
-<script src="mejoras.js"></script>
-</body>
