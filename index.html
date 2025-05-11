@@ -162,6 +162,20 @@
 
         let polyline, markers = [], cargas = 0;
 
+        // Tarifas por tramo para rutas simples y compuestas
+        const tarifas = {
+            "shanghai-buenaventura": [
+                { tramo: "Shanghai → Buenaventura", tarifa: 0.45 }
+            ],
+            "qingdao-busan-buenaventura": [
+                { tramo: "Qingdao → Busan", tarifa: 0.50 },
+                { tramo: "Busan → Buenaventura", tarifa: 0.42 }
+            ],
+            "busan-buenaventura": [
+                { tramo: "Busan → Buenaventura", tarifa: 0.42 }
+            ]
+        };
+
         function buscarBLPrincipal() {
             const bl = document.getElementById("blInput").value.trim();
             if (!bl || bl.length < 6) return alert("Por favor ingresa un BL válido (mínimo 6 caracteres).");
@@ -172,7 +186,7 @@
             if (polyline) map.removeLayer(polyline);
             markers = [];
 
-            // Datos simulados para dos BL
+            // Datos simulados
             let ruta = [];
             if (bl === "MEDUQT871264") {
                 ruta = [
@@ -213,7 +227,6 @@
         }
 
         function buscarBLSecundario() {
-            // Copia el BL al input principal y reutiliza la lógica
             const bl = document.getElementById("blNumber").value.trim();
             document.getElementById("blInput").value = bl;
             buscarBLPrincipal();
@@ -221,38 +234,45 @@
         }
 
         function simularCarga() {
-            const origen = document.getElementById("origen").value.trim();
-            const destino = document.getElementById("destino").value.trim();
-            const peso = parseFloat(document.getElementById("peso").value);
-            const res = document.getElementById("simuladorResultado");
-            if (!origen||!destino||isNaN(peso)||peso<=0) return void(res.textContent="Ingresa datos válidos.");
+            const origen  = document.getElementById("origen").value.trim().toLowerCase();
+            const destino = document.getElementById("destino").value.trim().toLowerCase();
+            const peso    = parseFloat(document.getElementById("peso").value);
+            const res     = document.getElementById("simuladorResultado");
 
-            const tarifas = {
-                "shanghai-buenaventura": 0.45,
-                "qingdao-busan-buenaventura": 0.50,
-                "busan-buenaventura": 0.42
-            };
-            const clave = `${origen.toLowerCase()}-${destino.toLowerCase()}`;
-            const tarifa = tarifas[clave];
-            if (!tarifa) return void(res.innerHTML=`Ruta ${origen}→${destino} no registrada.<br>Contacta soporte.`);
+            // Validación
+            if (!origen || !destino || isNaN(peso) || peso <= 0) {
+                res.textContent = "Por favor ingresa datos válidos.";
+                return;
+            }
 
-            const tiempo = 12 + Math.floor(Math.random()*5);
-            const costo = (peso*tarifa).toFixed(2);
-            res.innerHTML = `
-                <strong>Simulación:</strong><br>
-                Ruta: ${origen} → ${destino}<br>
-                Peso: ${peso} kg<br>
-                Tarifa/kg: $${tarifa} USD<br>
-                <u>Costo total: $${costo} USD</u><br>
-                Tiempo estimado: ${tiempo} días
-            `;
+            const clave = `${origen}-${destino}`;
+            const ruta  = tarifas[clave];
+
+            if (!ruta) {
+                res.innerHTML = `Ruta <b>${origen} → ${destino}</b> no registrada.<br>Contacta soporte.`;
+                return;
+            }
+
+            // Cálculo por tramo
+            let total = 0;
+            let html  = `<h3>Desglose de costos</h3><ul>`;
+            ruta.forEach(({ tramo, tarifa }) => {
+                const costoTramo = (peso * tarifa).toFixed(2);
+                total += parseFloat(costoTramo);
+                html += `<li><b>${tramo}</b>: $${costoTramo} USD (tarifa $${tarifa}/kg)</li>`;
+            });
+            html += `</ul><h3>Total estimado: $${total.toFixed(2)} USD<br>Peso: ${peso} kg</h3>`;
+
+            res.innerHTML = html;
         }
 
         function iniciarSesion() {
             const u = document.getElementById("usuarioNombre").value;
             const p = document.getElementById("usuarioClave").value;
             document.getElementById("usuarioMensaje").textContent =
-                (u==="admin"&&p==="1234") ? "Inicio exitoso." : "Usuario o contraseña incorrecta.";
+                (u === "admin" && p === "1234")
+                ? "Inicio exitoso."
+                : "Usuario o contraseña incorrecta.";
         }
 
         function enviarFormularioPrincipal(e) {
@@ -269,7 +289,11 @@
         document.addEventListener("click", e => {
             const panel = document.getElementById("panelEstadisticas");
             const boton = document.querySelector(".boton-flotante");
-            if (panel.classList.contains("activo") && !panel.contains(e.target) && !boton.contains(e.target)) {
+            if (
+                panel.classList.contains("activo")
+                && !panel.contains(e.target)
+                && !boton.contains(e.target)
+            ) {
                 panel.classList.remove("activo");
             }
         });
@@ -278,23 +302,30 @@
             document.getElementById("totalCargasPanel").textContent = cargas;
             const ul = document.getElementById("rutasComunesPanel");
             ul.innerHTML = "";
-            ["Shanghai - Buenaventura","Qingdao - Busan - Buenaventura"].forEach(r=> {
-                const li=document.createElement("li"); li.textContent=r; ul.appendChild(li);
+            ["Shanghai - Buenaventura","Qingdao - Busan - Buenaventura"].forEach(r => {
+                const li = document.createElement("li");
+                li.textContent = r;
+                ul.appendChild(li);
             });
             document.getElementById("promedioTransitoPanel").textContent = "25–35 días";
         }
 
-        document.querySelectorAll("nav a").forEach(link=>{
-            link.addEventListener("click", e=>{
+        document.querySelectorAll("nav a").forEach(link => {
+            link.addEventListener("click", e => {
                 e.preventDefault();
-                document.querySelectorAll(".contenedor, .formulario-contacto").forEach(s=>s.classList.add("seccion-oculta"));
-                const id=link.getAttribute("href").substring(1);
-                const sec=document.getElementById(id);
-                if(sec){ sec.classList.remove("seccion-oculta"); window.scrollTo({ top: sec.offsetTop-50, behavior:"smooth" }); }
+                document.querySelectorAll(".contenedor, .formulario-contacto").forEach(sec =>
+                    sec.classList.add("seccion-oculta")
+                );
+                const id = link.getAttribute("href").substring(1);
+                const sec = document.getElementById(id);
+                if (sec) {
+                    sec.classList.remove("seccion-oculta");
+                    window.scrollTo({ top: sec.offsetTop - 50, behavior: "smooth" });
+                }
             });
         });
 
-        // Inicia estadísticas
+        // Inicializa estadísticas
         actualizarEstadisticas();
     </script>
 </body>
