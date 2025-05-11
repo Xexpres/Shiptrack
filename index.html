@@ -25,18 +25,13 @@
         th { background-color: #003366; color: white; }
         footer { text-align: center; padding: 10px; background-color: #003366; color: white; margin-top: 30px; }
 
-        /* Formulario de contacto */
         .formulario-contacto { background: #fff; padding: 20px; margin: 30px auto; border-radius: 8px; max-width: 600px; }
-
-        /* Botón flotante y panel de estadísticas */
         .boton-flotante { position: fixed; bottom: 20px; right: 20px; background-color: #003366; color: white; border: none; border-radius: 50%; width: 60px; height: 60px; font-size: 24px; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.3); z-index: 1000; transition: background-color 0.3s, transform 0.2s; }
         .boton-flotante:hover { background-color: #005599; transform: scale(1.1); }
         #panelEstadisticas { position: fixed; bottom: 90px; right: 20px; width: 320px; background: white; border-radius: 10px; padding: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); display: none; z-index: 999; opacity: 0; transform: translateY(10px); transition: all 0.3s; }
         #panelEstadisticas.activo { display: block; opacity: 1; transform: translateY(0); }
         #panelEstadisticas .cerrar-panel { background: none; border: none; font-size: 20px; position: absolute; top: 8px; right: 10px; cursor: pointer; color: #888; }
         #panelEstadisticas .cerrar-panel:hover { color: #333; }
-
-        /* Chatbot */
         .chatbot-button { position: fixed; bottom: 70px; right: 85px; background: #0077cc; color: white; border: none; border-radius: 50%; width: 60px; height: 60px; font-size: 24px; box-shadow: 0 0 10px rgba(0,0,0,0.3); cursor: pointer; z-index: 998; }
     </style>
 </head>
@@ -57,13 +52,11 @@
         <a href="#cuenta">Mi Cuenta</a>
     </nav>
 
-    <!-- Inicio -->
     <div id="inicio" class="contenedor">
         <input type="text" id="blInput" placeholder="Ingrese su número de BL" required>
         <button onclick="buscarBLPrincipal()">Buscar</button>
     </div>
 
-    <!-- Búsqueda secundaria BL -->
     <div id="busqueda" class="contenedor seccion-oculta">
         <h2>Buscar conocimiento de embarque (BL)</h2>
         <form onsubmit="return buscarBLSecundario();">
@@ -73,10 +66,8 @@
         <div id="resultContainer">Introduce un número BL para ver resultados aquí.</div>
     </div>
 
-    <!-- Mapa -->
     <div id="mapa"></div>
 
-    <!-- Tabla de eventos -->
     <table>
         <thead>
             <tr><th>Puerto / Evento</th><th>Fecha / Tránsito</th><th>Detalle</th></tr>
@@ -84,7 +75,6 @@
         <tbody id="tablaEventos"></tbody>
     </table>
 
-    <!-- Simulador -->
     <div id="simulador" class="contenedor seccion-oculta">
         <h2>Simulador de carga</h2>
         <form onsubmit="simularCarga(); return false;">
@@ -96,7 +86,6 @@
         <div id="simuladorResultado"></div>
     </div>
 
-    <!-- Usuario -->
     <div id="usuario" class="contenedor seccion-oculta">
         <h2>Área de Usuario</h2>
         <form onsubmit="iniciarSesion(); return false;">
@@ -107,7 +96,6 @@
         <div id="usuarioMensaje"></div>
     </div>
 
-    <!-- Contacto -->
     <div id="contacto" class="formulario-contacto seccion-oculta">
         <h2>Contacto</h2>
         <form onsubmit="enviarFormularioPrincipal(event)">
@@ -119,19 +107,16 @@
         <p>O escríbenos a <strong>soporte@shiptrack.com</strong> o por <a href="https://wa.me/1234567890" target="_blank">WhatsApp</a></p>
     </div>
 
-    <!-- Ayuda -->
     <div id="ayuda" class="contenedor seccion-oculta">
         <h2>Ayuda</h2>
         <p>Aquí encontrarás información útil y preguntas frecuentes sobre Shiptrack.</p>
     </div>
 
-    <!-- Mi Cuenta -->
     <div id="cuenta" class="contenedor seccion-oculta">
         <h2>Mi Cuenta</h2>
         <p>Funcionalidad futura: guarda tus BL, recibe notificaciones y personaliza tu experiencia.</p>
     </div>
 
-    <!-- Panel de estadísticas -->
     <div id="panelEstadisticas">
         <button class="cerrar-panel" onclick="togglePanel()">&times;</button>
         <h3><i class="fas fa-chart-bar"></i> Estadísticas</h3>
@@ -141,7 +126,6 @@
         <p>Tiempo promedio tránsito: <span id="promedioTransitoPanel">-</span></p>
     </div>
 
-    <!-- Botones flotantes -->
     <button class="boton-flotante" onclick="togglePanel()">
         <i class="fas fa-chart-bar"></i>
     </button>
@@ -156,13 +140,12 @@
     <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
     <script>
         const map = L.map('mapa').setView([20, 0], 2);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; OpenStreetMap contributors'
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+            attribution:'&copy; OpenStreetMap contributors'
         }).addTo(map);
 
         let polyline, markers = [], cargas = 0;
 
-        // Tarifas por tramo para rutas simples y compuestas
         const tarifas = {
             "shanghai-buenaventura": [
                 { tramo: "Shanghai → Buenaventura", tarifa: 0.45 }
@@ -176,156 +159,140 @@
             ]
         };
 
-        function buscarBLPrincipal() {
+        function buscarBLPrincipal(){
             const bl = document.getElementById("blInput").value.trim();
-            if (!bl || bl.length < 6) return alert("Por favor ingresa un BL válido (mínimo 6 caracteres).");
+            if(!bl || bl.length<6) return alert("BL inválido (mínimo 6 caracteres).");
 
-            // Limpiar mapa y tabla
-            document.getElementById("tablaEventos").innerHTML = "";
-            markers.forEach(m => map.removeLayer(m));
-            if (polyline) map.removeLayer(polyline);
-            markers = [];
+            // limpia
+            document.getElementById("tablaEventos").innerHTML="";
+            markers.forEach(m=>map.removeLayer(m));
+            if(polyline) map.removeLayer(polyline);
+            markers=[];
 
-            // Datos simulados
-            let ruta = [];
-            if (bl === "MEDUQT871264") {
-                ruta = [
-                    { nombre: "Qingdao - Cargado", coords: [36.0671, 120.3826], tiempo: "17 feb 2025" },
-                    { nombre: "Busan - Transbordo", coords: [35.1796, 129.0756], tiempo: "22-23 feb 2025" },
-                    { nombre: "Buenaventura - Descarga", coords: [3.8801, -77.0312], tiempo: "25 mar 2025" }
+            let ruta=[];
+            if(bl==="MEDUQT871264"){
+                ruta=[
+                    {nombre:"Qingdao - Cargado",coords:[36.0671,120.3826],tiempo:"17 feb 2025"},
+                    {nombre:"Busan - Transbordo",coords:[35.1796,129.0756],tiempo:"22-23 feb 2025"},
+                    {nombre:"Buenaventura - Descarga",coords:[3.8801,-77.0312],tiempo:"25 mar 2025"}
                 ];
-            } else if (bl === "250339340") {
-                ruta = [
-                    { nombre: "Shanghai - Vacío", coords: [31.2304, 121.4737], tiempo: "24 feb 2025" },
-                    { nombre: "Salida buque", coords: [31.2304, 121.4737], tiempo: "6 mar 2025" },
-                    { nombre: "Buenaventura - Llegada", coords: [3.8801, -77.0312], tiempo: "3 abr 2025" }
+            } else if(bl==="250339340"){
+                ruta=[
+                    {nombre:"Shanghai - Vacío",coords:[31.2304,121.4737],tiempo:"24 feb 2025"},
+                    {nombre:"Salida buque",coords:[31.2304,121.4737],tiempo:"6 mar 2025"},
+                    {nombre:"Buenaventura - Llegada",coords:[3.8801,-77.0312],tiempo:"3 abr 2025"}
                 ];
             } else {
                 return alert("BL no reconocido.");
             }
 
-            // Dibujar marcadores y línea
-            const coords = [];
-            ruta.forEach(p => {
-                const m = L.marker(p.coords).addTo(map).bindPopup(`<strong>${p.nombre}</strong><br>${p.tiempo}`);
-                markers.push(m);
-                coords.push(p.coords);
-                const row = document.getElementById("tablaEventos").insertRow();
-                row.insertCell(0).textContent = p.nombre;
-                row.insertCell(1).textContent = p.tiempo;
-                row.insertCell(2).textContent = "-";
+            const coords=[];
+            ruta.forEach(p=>{
+                const m=L.marker(p.coords).addTo(map).bindPopup(`<strong>${p.nombre}</strong><br>${p.tiempo}`);
+                markers.push(m); coords.push(p.coords);
+                const row=document.getElementById("tablaEventos").insertRow();
+                row.insertCell(0).textContent=p.nombre;
+                row.insertCell(1).textContent=p.tiempo;
+                row.insertCell(2).textContent="-";
             });
-            if (coords.length > 1) {
-                polyline = L.polyline(coords, { color: 'blue' }).addTo(map);
+            if(coords.length>1){
+                polyline=L.polyline(coords,{color:'blue'}).addTo(map);
                 map.fitBounds(polyline.getBounds());
             } else {
-                map.setView(coords[0], 5);
+                map.setView(coords[0],5);
             }
-
-            cargas++;
-            actualizarEstadisticas();
+            cargas++; actualizarEstadisticas();
         }
 
-        function buscarBLSecundario() {
-            const bl = document.getElementById("blNumber").value.trim();
-            document.getElementById("blInput").value = bl;
+        function buscarBLSecundario(){
+            const bl=document.getElementById("blNumber").value.trim();
+            document.getElementById("blInput").value=bl;
             buscarBLPrincipal();
             return false;
         }
 
-        function simularCarga() {
-            const origen  = document.getElementById("origen").value.trim().toLowerCase();
-            const destino = document.getElementById("destino").value.trim().toLowerCase();
-            const peso    = parseFloat(document.getElementById("peso").value);
-            const res     = document.getElementById("simuladorResultado");
-
-            // Validación
-            if (!origen || !destino || isNaN(peso) || peso <= 0) {
-                res.textContent = "Por favor ingresa datos válidos.";
+        function simularCarga(){
+            const origen=document.getElementById("origen").value.trim().toLowerCase();
+            const destino=document.getElementById("destino").value.trim().toLowerCase();
+            const peso=parseFloat(document.getElementById("peso").value);
+            const res=document.getElementById("simuladorResultado");
+            if(!origen||!destino||isNaN(peso)||peso<=0){
+                res.textContent="Ingresa datos válidos.";
                 return;
             }
 
-            const clave = `${origen}-${destino}`;
-            const ruta  = tarifas[clave];
-
-            if (!ruta) {
-                res.innerHTML = `Ruta <b>${origen} → ${destino}</b> no registrada.<br>Contacta soporte.`;
+            // si es qingdao→buenaventura, intenta compuesta
+            let clave=`${origen}-${destino}`;
+            if(!tarifas[clave] && origen==="qingdao"&&destino==="buenaventura"){
+                clave="qingdao-busan-buenaventura";
+            }
+            const ruta=tarifas[clave];
+            if(!ruta){
+                res.innerHTML=`Ruta <b>${origen} → ${destino}</b> no registrada.<br>Contacta soporte.`;
                 return;
             }
 
-            // Cálculo por tramo
-            let total = 0;
-            let html  = `<h3>Desglose de costos</h3><ul>`;
-            ruta.forEach(({ tramo, tarifa }) => {
-                const costoTramo = (peso * tarifa).toFixed(2);
-                total += parseFloat(costoTramo);
-                html += `<li><b>${tramo}</b>: $${costoTramo} USD (tarifa $${tarifa}/kg)</li>`;
+            let total=0; let html=`<h3>Desglose de costos</h3><ul>`;
+            ruta.forEach(({tramo,tarifa})=>{
+                const costo=(peso*tarifa).toFixed(2);
+                total+=parseFloat(costo);
+                html+=`<li><b>${tramo}</b>: $${costo} USD (tarifa $${tarifa}/kg)</li>`;
             });
-            html += `</ul><h3>Total estimado: $${total.toFixed(2)} USD<br>Peso: ${peso} kg</h3>`;
-
-            res.innerHTML = html;
+            html+=`</ul><h3>Total: $${total.toFixed(2)} USD<br>Peso: ${peso} kg</h3>`;
+            res.innerHTML=html;
         }
 
-        function iniciarSesion() {
-            const u = document.getElementById("usuarioNombre").value;
-            const p = document.getElementById("usuarioClave").value;
-            document.getElementById("usuarioMensaje").textContent =
-                (u === "admin" && p === "1234")
-                ? "Inicio exitoso."
-                : "Usuario o contraseña incorrecta.";
+        function iniciarSesion(){
+            const u=document.getElementById("usuarioNombre").value;
+            const p=document.getElementById("usuarioClave").value;
+            document.getElementById("usuarioMensaje").textContent=
+                (u==="admin"&&p==="1234")?"Inicio exitoso.":"Usuario o contraseña incorrecta.";
         }
 
-        function enviarFormularioPrincipal(e) {
+        function enviarFormularioPrincipal(e){
             e.preventDefault();
-            const nombre = document.getElementById("nombre").value;
-            alert(`Gracias por contactarnos, ${nombre}. Te responderemos pronto.`);
+            const n=document.getElementById("nombre").value;
+            alert(`Gracias por contactarnos, ${n}. Te responderemos pronto.`);
             e.target.reset();
         }
 
-        function togglePanel() {
+        function togglePanel(){
             document.getElementById("panelEstadisticas").classList.toggle("activo");
         }
 
-        document.addEventListener("click", e => {
-            const panel = document.getElementById("panelEstadisticas");
-            const boton = document.querySelector(".boton-flotante");
-            if (
-                panel.classList.contains("activo")
-                && !panel.contains(e.target)
-                && !boton.contains(e.target)
-            ) {
+        document.addEventListener("click",e=>{
+            const panel=document.getElementById("panelEstadisticas");
+            const btn=document.querySelector(".boton-flotante");
+            if(panel.classList.contains("activo")&&!panel.contains(e.target)&&!btn.contains(e.target)){
                 panel.classList.remove("activo");
             }
         });
 
-        function actualizarEstadisticas() {
-            document.getElementById("totalCargasPanel").textContent = cargas;
-            const ul = document.getElementById("rutasComunesPanel");
-            ul.innerHTML = "";
-            ["Shanghai - Buenaventura","Qingdao - Busan - Buenaventura"].forEach(r => {
-                const li = document.createElement("li");
-                li.textContent = r;
-                ul.appendChild(li);
+        function actualizarEstadisticas(){
+            document.getElementById("totalCargasPanel").textContent=cargas;
+            const ul=document.getElementById("rutasComunesPanel");
+            ul.innerHTML="";
+            ["Shanghai - Buenaventura","Qingdao - Busan - Buenaventura"].forEach(r=>{
+                const li=document.createElement("li");
+                li.textContent=r; ul.appendChild(li);
             });
-            document.getElementById("promedioTransitoPanel").textContent = "25–35 días";
+            document.getElementById("promedioTransitoPanel").textContent="25–35 días";
         }
 
-        document.querySelectorAll("nav a").forEach(link => {
-            link.addEventListener("click", e => {
+        document.querySelectorAll("nav a").forEach(link=>{
+            link.addEventListener("click",e=>{
                 e.preventDefault();
-                document.querySelectorAll(".contenedor, .formulario-contacto").forEach(sec =>
-                    sec.classList.add("seccion-oculta")
-                );
-                const id = link.getAttribute("href").substring(1);
-                const sec = document.getElementById(id);
-                if (sec) {
+                document.querySelectorAll(".contenedor, .formulario-contacto")
+                    .forEach(s=>s.classList.add("seccion-oculta"));
+                const id=link.getAttribute("href").substring(1);
+                const sec=document.getElementById(id);
+                if(sec){
                     sec.classList.remove("seccion-oculta");
-                    window.scrollTo({ top: sec.offsetTop - 50, behavior: "smooth" });
+                    window.scrollTo({top:sec.offsetTop-50,behavior:"smooth"});
                 }
             });
         });
 
-        // Inicializa estadísticas
         actualizarEstadisticas();
     </script>
 </body>
