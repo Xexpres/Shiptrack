@@ -4,10 +4,13 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Shiptrack - Seguimiento de Carga</title>
+  <!-- Favicon y Logo -->
+  <link rel="icon" href="logo-dark.png" type="image/png"/>
+
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Leaflet -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"/>
   <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
   <!-- FontAwesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous"/>
@@ -19,7 +22,7 @@
   <!-- HEADER -->
   <header class="bg-blue-800 dark:bg-gray-800 text-white p-4 flex justify-between items-center shadow-md">
     <div class="flex items-center space-x-3">
-      <img src="https://cdn-icons-png.flaticon.com/512/1063/1063191.png" class="h-8 w-8" alt="Logo"/>
+      <img src="logo-dark.png" class="h-10 w-10" alt="Shiptrack Logo"/>
       <h1 class="text-xl font-semibold">Shiptrack</h1>
     </div>
     <button id="themeToggle" class="p-2 rounded hover:bg-blue-700 dark:hover:bg-gray-700 transition">
@@ -47,11 +50,9 @@
       <h2 class="text-2xl font-bold mb-4">Buscar BL</h2>
       <form class="flex items-end gap-4" onsubmit="return buscarBLPrincipal();">
         <div class="relative flex-1">
-          <input
-            id="blNumber" type="text" required minlength="6"
+          <input id="blNumber" type="text" required minlength="6"
             class="peer w-full border-b-2 border-gray-300 bg-transparent py-2.5 px-0 text-gray-900 dark:text-white focus:border-blue-600 outline-none"
-            placeholder=" "
-          />
+            placeholder=" "/>
           <label for="blNumber"
             class="absolute left-0 top-3 -translate-y-6 scale-75 transform text-gray-500 duration-300
                    peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100
@@ -67,25 +68,22 @@
           <i class="fas fa-search"></i> Buscar
         </button>
       </form>
-      <!-- Botón Historial -->
       <button id="histBtn"
         class="absolute top-6 right-6 bg-gray-200 dark:bg-gray-700 p-2 rounded-full shadow hover:bg-gray-300 dark:hover:bg-gray-600 transition"
-        onclick="toggleHist()"
-        title="Ver historial de BL">
+        onclick="toggleHist()" title="Ver historial">
         <i class="fas fa-history"></i>
       </button>
-      <!-- Panel de historial -->
-      <div id="histPanel" class="absolute top-16 right-6 w-64 max-h-64 overflow-auto bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg hidden z-10">
-        <h3 class="p-2 border-b border-gray-200 dark:border-gray-700 font-semibold">Historial</h3>
-        <ul id="histList" class="divide-y divide-gray-200 dark:divide-gray-700"></ul>
+      <div id="histPanel" class="absolute top-16 right-6 w-64 max-h-64 overflow-auto bg-white dark:bg-gray-800 border rounded-lg shadow-lg hidden z-10">
+        <h3 class="p-2 border-b dark:border-gray-700 font-semibold">Historial</h3>
+        <ul id="histList" class="divide-y dark:divide-gray-700"></ul>
       </div>
     </section>
 
     <!-- MAPA -->
-    <section id="mapa" class="h-96 rounded-lg overflow-hidden shadow hover:shadow-lg transition"></section>
+    <section id="mapa" class="h-96 rounded-lg overflow-hidden shadow"></section>
 
     <!-- TABLA DE EVENTOS -->
-    <section class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow hover:shadow-lg transition">
+    <section class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
       <h2 class="text-2xl font-bold mb-4">Eventos de Ruta</h2>
       <table class="w-full text-left border-collapse">
         <thead>
@@ -100,78 +98,43 @@
     </section>
 
     <!-- SIMULADOR -->
-    <section id="simulador" class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow hover:shadow-lg transition seccion-oculta">
+    <section id="simulador" class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow seccion-oculta">
       <h2 class="text-2xl font-bold mb-4">Simulador de Carga</h2>
       <form onsubmit="simularCarga(); return false;" class="space-y-4">
-        <!-- Modo -->
         <div class="relative z-0 w-full group">
-          <select
-            id="modo"
-            class="peer block w-full border-0 border-b-2 border-gray-300 bg-transparent py-2.5 px-0 text-gray-900 dark:text-white focus:border-blue-600 focus:outline-none"
+          <select id="modo"
+            class="peer block w-full border-0 border-b-2 border-gray-300 bg-transparent py-2.5 px-0 focus:border-blue-600 outline-none"
             required>
             <option value="maritimo">Marítimo</option>
             <option value="aereo">Aéreo</option>
           </select>
-          <label
-            for="modo"
-            class="absolute top-3 -z-10 origin-[0] -translate-y-6 scale-75 transform text-gray-500 duration-300 peer-focus:-translate-y-6 peer-focus:scale-75">
+          <label for="modo" class="absolute top-3 -translate-y-6 scale-75 transform text-gray-500 duration-300 peer-focus:-translate-y-6 peer-focus:scale-75">
             Modo de Transporte
           </label>
         </div>
-        <!-- Origen -->
         <div class="relative z-0 w-full group">
-          <input
-            id="origen"
-            type="text"
-            class="peer block w-full border-0 border-b-2 border-gray-300 bg-transparent py-2.5 px-0 text-gray-900 dark:text-white focus:border-blue-600 focus:outline-none"
-            placeholder=" "
-            required
-          />
-          <label
-            for="origen"
-            class="absolute top-3 -z-10 origin-[0] -translate-y-6 scale-75 transform text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:-translate-y-6 peer-focus:scale-75">
+          <input id="origen" type="text"
+            class="peer block w-full border-0 border-b-2 border-gray-300 bg-transparent py-2.5 px-0 focus:border-blue-600 outline-none"
+            placeholder=" " required/>
+          <label for="origen" class="absolute top-3 -translate-y-6 scale-75 transform text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:-translate-y-6 peer-focus:scale-75">
             Origen
           </label>
-          <p class="mt-2 text-sm text-red-600 dark:text-red-400 invisible peer-invalid:visible">
-            Campo obligatorio.
-          </p>
         </div>
-        <!-- Destino -->
         <div class="relative z-0 w-full group">
-          <input
-            id="destino"
-            type="text"
-            class="peer block w-full border-0 border-b-2 border-gray-300 bg-transparent py-2.5 px-0 text-gray-900 dark:text-white focus:border-blue-600 focus:outline-none"
-            placeholder=" "
-            required
-          />
-          <label
-            for="destino"
-            class="absolute top-3 -z-10 origin-[0] -translate-y-6 scale-75 transform text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:-translate-y-6 peer-focus:scale-75">
+          <input id="destino" type="text"
+            class="peer block w-full border-0 border-b-2 border-gray-300 bg-transparent py-2.5 px-0 focus:border-blue-600 outline-none"
+            placeholder=" " required/>
+          <label for="destino" class="absolute top-3 -translate-y-6 scale-75 transform text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:-translate-y-6 peer-focus:scale-75">
             Destino
           </label>
-          <p class="mt-2 text-sm text-red-600 dark:text-red-400 invisible peer-invalid:visible">
-            Campo obligatorio.
-          </p>
         </div>
-        <!-- Peso -->
         <div class="relative z-0 w-full group">
-          <input
-            id="peso"
-            type="number"
-            min="1"
-            class="peer block w-full border-0 border-b-2 border-gray-300 bg-transparent py-2.5 px-0 text-gray-900 dark:text-white focus:border-blue-600 focus:outline-none"
-            placeholder=" "
-            required
-          />
-          <label
-            for="peso"
-            class="absolute top-3 -z-10 origin-[0] -translate-y-6 scale-75 transform text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:-translate-y-6 peer-focus:scale-75">
+          <input id="peso" type="number" min="1"
+            class="peer block w-full border-0 border-b-2 border-gray-300 bg-transparent py-2.5 px-0 focus:border-blue-600 outline-none"
+            placeholder=" " required/>
+          <label for="peso" class="absolute top-3 -translate-y-6 scale-75 transform text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:-translate-y-6 peer-focus:scale-75">
             Peso (kg)
           </label>
-          <p class="mt-2 text-sm text-red-600 dark:text-red-400 invisible peer-invalid:visible">
-            Ingresa un valor positivo.
-          </p>
         </div>
         <button type="submit" class="w-full py-3 bg-green-600 hover:bg-green-700 text-white rounded transition">
           Simular
@@ -181,62 +144,32 @@
     </section>
 
     <!-- CONTACTO -->
-    <section id="contacto" class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow hover:shadow-lg transition seccion-oculta">
+    <section id="contacto" class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow seccion-oculta">
       <h2 class="text-2xl font-bold mb-4">Contacto</h2>
       <form onsubmit="enviarFormularioPrincipal(event)" class="space-y-6">
-        <!-- Nombre -->
         <div class="relative z-0 w-full group">
-          <input
-            id="nombre"
-            type="text"
-            class="peer block w-full border-0 border-b-2 border-gray-300 bg-transparent py-2.5 px-0 text-gray-900 dark:text-white focus:border-blue-600 focus:outline-none"
-            placeholder=" "
-            required
-          />
-          <label
-            for="nombre"
-            class="absolute top-3 -z-10 origin-[0] -translate-y-6 scale-75 transform text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:-translate-y-6 peer-focus:scale-75">
+          <input id="nombre" type="text"
+            class="peer block w-full border-0 border-b-2 border-gray-300 bg-transparent py-2.5 px-0 focus:border-blue-600 outline-none"
+            placeholder=" " required/>
+          <label for="nombre" class="absolute top-3 -translate-y-6 scale-75 transform text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:-translate-y-6 peer-focus:scale-75">
             Tu nombre
           </label>
-          <p class="mt-2 text-sm text-red-600 dark:text-red-400 invisible peer-invalid:visible">
-            Obligatorio.
-          </p>
         </div>
-        <!-- Email -->
         <div class="relative z-0 w-full group">
-          <input
-            id="email"
-            type="email"
-            class="peer block w-full border-0 border-b-2 border-gray-300 bg-transparent py-2.5 px-0 text-gray-900 dark:text-white focus:border-blue-600 focus:outline-none"
-            placeholder=" "
-            required
-            pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
-          />
-          <label
-            for="email"
-            class="absolute top-3 -z-10 origin-[0] -translate-y-6 scale-75 transform text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:-translate-y-6 peer-focus:scale-75">
+          <input id="email" type="email"
+            class="peer block w-full border-0 border-b-2 border-gray-300 bg-transparent py-2.5 px-0 focus:border-blue-600 outline-none"
+            placeholder=" " required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"/>
+          <label for="email" class="absolute top-3 -translate-y-6 scale-75 transform text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:-translate-y-6 peer-focus:scale-75">
             Tu correo electrónico
           </label>
-          <p class="mt-2 text-sm text-red-600 dark:text-red-400 invisible peer-invalid:visible">
-            Ingresa un email válido.
-          </p>
         </div>
-        <!-- Mensaje -->
         <div class="relative z-0 w-full group">
-          <textarea
-            id="mensaje"
-            rows="4"
-            class="peer block w-full border-0 border-b-2 border-gray-300 bg-transparent py-2.5 px-0 text-gray-900 dark:text-white focus:border-blue-600 focus:outline-none resize-none"
-            placeholder=" "
-            required></textarea>
-          <label
-            for="mensaje"
-            class="absolute top-3 -z-10 origin-[0] -translate-y-6 scale-75 transform text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:-translate-y-6 peer-focus:scale-75">
+          <textarea id="mensaje" rows="4"
+            class="peer block w-full border-0 border-b-2 border-gray-300 bg-transparent py-2.5 px-0 focus:border-blue-600 outline-none resize-none"
+            placeholder=" " required></textarea>
+          <label for="mensaje" class="absolute top-3 -translate-y-6 scale-75 transform text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:-translate-y-6 peer-focus:scale-75">
             Tu mensaje
           </label>
-          <p class="mt-2 text-sm text-red-600 dark:text-red-400 invisible peer-invalid:visible">
-            Obligatorio.
-          </p>
         </div>
         <button type="submit" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded transition">
           Enviar mensaje
@@ -247,21 +180,21 @@
   </main>
 
   <!-- PANEL ESTADÍSTICAS -->
-  <div id="panelEstadisticas" class="fixed bottom-6 left-6 w-80 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg transform translate-y-40 transition-transform">
+  <div id="panelEstadisticas" class="fixed bottom-6 left-6 w-80 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg hidden">
     <button class="absolute top-2 right-2 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" onclick="togglePanel()">&times;</button>
     <h3 class="text-lg font-semibold mb-4">Estadísticas</h3>
     <p>Cargas rastreadas: <span id="totalCargasPanel">0</span></p>
     <p>Tiempo tránsito: <span id="promedioTransitoPanel">-</span></p>
     <p>TRM (USD→COP): <span id="dolarHoy">Cargando…</span></p>
-    <p>Cont. 20’: <span id="precio20">-</span>  Cont. 40’: <span id="precio40">-</span></p>
+    <p>Cont. 20’: <span id="precio20">-</span> Cont. 40’: <span id="precio40">-</span></p>
     <canvas id="chartRutas" class="mt-4"></canvas>
   </div>
 
   <!-- BOTONES FLOTANTES -->
-  <button class="boton-flotante fixed bottom-6 right-6 bg-blue-600 text-white p-4 rounded-full shadow-lg hover:bg-blue-700 transition" onclick="togglePanel()">
+  <button id="statsBtn" class="fixed bottom-6 right-6 bg-blue-600 text-white p-4 rounded-full shadow-lg hover:bg-blue-700 transition" onclick="togglePanel()">
     <i class="fas fa-chart-bar"></i>
   </button>
-  <button class="chatbot-button fixed bottom-6 right-24 bg-blue-500 text-white p-4 rounded-full shadow-lg hover:bg-blue-600 transition" onclick="toggleChat()">
+  <button id="chatBtn" class="fixed bottom-6 right-24 bg-blue-500 text-white p-4 rounded-full shadow-lg hover:bg-blue-600 transition" onclick="toggleChat()">
     <i class="fas fa-robot"></i>
   </button>
 
@@ -294,57 +227,49 @@
 
     // Reset map & table
     function resetMapAndTable() {
-      markers.forEach(m => map.removeLayer(m));
-      markers = [];
+      markers.forEach(m => map.removeLayer(m)); markers = [];
       if (polyline) map.removeLayer(polyline);
       document.getElementById('tablaEventos').innerHTML = '';
     }
 
     // Draw route
     function drawRoute(ruta) {
-      const coords = [];
-      ruta.forEach(p => {
-        const m = L.marker(p.coords).addTo(map).bindPopup(`<strong>${p.nombre}</strong><br><small>${p.tiempo}</small>`);
-        markers.push(m);
-        coords.push(p.coords);
-        const row = document.getElementById('tablaEventos').insertRow();
-        row.insertCell(0).textContent = p.nombre;
-        row.insertCell(1).textContent = p.tiempo;
-        row.insertCell(2).textContent = '-';
+      const coords=[];
+      ruta.forEach(p=>{
+        const m=L.marker(p.coords).addTo(map).bindPopup(`<strong>${p.nombre}</strong><br><small>${p.tiempo}</small>`);
+        markers.push(m); coords.push(p.coords);
+        const row=document.getElementById('tablaEventos').insertRow();
+        row.insertCell(0).textContent=p.nombre;
+        row.insertCell(1).textContent=p.tiempo;
+        row.insertCell(2).textContent='-';
       });
-      if (coords.length > 1) {
-        polyline = L.polyline(coords, { color: 'blue' }).addTo(map);
+      if(coords.length>1){
+        polyline=L.polyline(coords,{color:'blue'}).addTo(map);
         map.fitBounds(polyline.getBounds());
-      } else {
-        map.setView(coords[0], 5);
-      }
+      } else map.setView(coords[0],5);
     }
 
     // Search BL
-    function buscarBLPrincipal() {
-      const bl = document.getElementById('blNumber').value.trim();
-      if (bl.length < 6) return false;
+    function buscarBLPrincipal(){
+      const bl=document.getElementById('blNumber').value.trim();
+      if(bl.length<6) return false;
       // save history
-      const lista = JSON.parse(localStorage.getItem('busquedas')||'[]');
-      lista.push({ bl, fecha:new Date().toISOString() });
-      localStorage.setItem('busquedas', JSON.stringify(lista));
+      const lista=JSON.parse(localStorage.getItem('busquedas')||'[]');
+      lista.push({bl,fecha:new Date().toISOString()});
+      localStorage.setItem('busquedas',JSON.stringify(lista));
       resetMapAndTable();
-      let ruta = [];
-      if (bl==='MEDUQT871264') {
-        ruta = [
-          { nombre:'Qingdao - Cargado', coords:[36.0671,120.3826], tiempo:'17 feb 2025' },
-          { nombre:'Busan - Transbordo', coords:[35.1796,129.0756], tiempo:'22-23 feb 2025' },
-          { nombre:'Buenaventura - Descarga', coords:[3.8801,-77.0312], tiempo:'25 mar 2025' }
-        ];
-      } else if (bl==='250339340') {
-        ruta = [
-          { nombre:'Shanghai - Vacío', coords:[31.2304,121.4737], tiempo:'24 feb 2025' },
-          { nombre:'Salida buque', coords:[31.2304,121.4737], tiempo:'6 mar 2025' },
-          { nombre:'Buenaventura - Llegada', coords:[3.8801,-77.0312], tiempo:'3 abr 2025' }
-        ];
-      } else {
-        return alert('BL no reconocido.');
-      }
+      let ruta=[];
+      if(bl==='MEDUQT871264') ruta=[
+        {nombre:'Qingdao - Cargado',coords:[36.0671,120.3826],tiempo:'17 feb 2025'},
+        {nombre:'Busan - Transbordo',coords:[35.1796,129.0756],tiempo:'22-23 feb 2025'},
+        {nombre:'Buenaventura - Descarga',coords:[3.8801,-77.0312],tiempo:'25 mar 2025'}
+      ];
+      else if(bl==='250339340') ruta=[
+        {nombre:'Shanghai - Vacío',coords:[31.2304,121.4737],tiempo:'24 feb 2025'},
+        {nombre:'Salida buque',coords:[31.2304,121.4737],tiempo:'6 mar 2025'},
+        {nombre:'Buenaventura - Llegada',coords:[3.8801,-77.0312],tiempo:'3 abr 2025'}
+      ];
+      else return alert('BL no reconocido.');
       drawRoute(ruta);
       cargas++; actualizarEstadisticas();
       return false;
@@ -352,90 +277,132 @@
 
     // History
     function loadHistory(){
-      const lista = JSON.parse(localStorage.getItem('busquedas')||'[]');
-      const ul = document.getElementById('histList'); ul.innerHTML='';
-      Array.from(lista).reverse().forEach(entry => {
-        const li = document.createElement('li');
-        li.textContent = entry.bl;
-        li.className = 'p-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700';
-        li.onclick = () => {
-          document.getElementById('blNumber').value = entry.bl;
-          toggleHist();
-          buscarBLPrincipal();
+      const lista=JSON.parse(localStorage.getItem('busquedas')||'[]'),
+            ul=document.getElementById('histList');
+      ul.innerHTML='';
+      Array.from(lista).reverse().forEach(entry=>{
+        const li=document.createElement('li');
+        li.textContent=entry.bl;
+        li.className='p-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700';
+        li.onclick=()=>{
+          document.getElementById('blNumber').value=entry.bl;
+          toggleHist(); buscarBLPrincipal();
         };
         ul.appendChild(li);
       });
     }
     function toggleHist(){
-      const panel = document.getElementById('histPanel');
-      panel.classList.toggle('hidden');
-      if (!panel.classList.contains('hidden')) loadHistory();
+      document.getElementById('histPanel').classList.toggle('hidden');
+      if(!document.getElementById('histPanel').classList.contains('hidden')) loadHistory();
     }
 
-    // TRM and container prices
-    async function cargarDolarHoy() {
-      try {
-        const r = await fetch('https://api.exchangerate.host/latest?base=USD&symbols=COP');
-        const j = await r.json();
-        document.getElementById('dolarHoy').textContent = j.rates.COP.toFixed(2) + ' COP';
-      } catch {
-        document.getElementById('dolarHoy').textContent = 'Error';
-      }
+    // Simulator
+    async function geocode(place){
+      const res=await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(place)}`);
+      const d=await res.json();
+      if(!d.length) throw new Error('Ubicación no encontrada');
+      return [parseFloat(d[0].lat),parseFloat(d[0].lon)];
     }
-    function cargarPreciosContenedores(){
-      document.getElementById('precio20').textContent = '$2 500';
-      document.getElementById('precio40').textContent = '$4 200';
+    function haversine([a1,o1],[a2,o2]){
+      const R=6371,d1=(a2-a1)*Math.PI/180,d2=(o2-o1)*Math.PI/180;
+      const x=Math.sin(d1/2)**2+Math.cos(a1*Math.PI/180)*Math.cos(a2*Math.PI/180)*Math.sin(d2/2)**2;
+      return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));
+    }
+    async function simularCarga(){
+      const modo=document.getElementById('modo').value;
+      const o=document.getElementById('origen').value.trim();
+      const d=document.getElementById('destino').value.trim();
+      const pVal=parseFloat(document.getElementById('peso').value);
+      const resDiv=document.getElementById('simuladorResultado');
+      if(!o||!d||isNaN(pVal)||pVal<=0){resDiv.textContent='Datos inválidos';return;}
+      resDiv.textContent='Calculando…';
+      try{
+        const c1=await geocode(o),c2=await geocode(d);
+        const dist=haversine(c1,c2).toFixed(1);
+        resetMapAndTable();
+        markers.push(L.marker(c1).addTo(map).bindPopup(o));
+        markers.push(L.marker(c2).addTo(map).bindPopup(d));
+        polyline=L.polyline([c1,c2],{color:modo==='aereo'?'red':'green'}).addTo(map);
+        map.fitBounds(polyline.getBounds(),{padding:[50,50]});
+        const rate=modo==='aereo'?0.05:0.002;
+        const cost=(dist*pVal*rate).toFixed(2);
+        resDiv.innerHTML=`
+          <h3>Simulación (${modo})</h3>
+          <ul>
+            <li>Distancia: ${dist} km</li>
+            <li>Peso: ${pVal} kg</li>
+            <li>Tarifa: $${rate} USD/(kg·km)</li>
+          </ul>
+          <h3>Costo: $${cost} USD</h3>`;
+      }catch(e){resDiv.textContent=e.message;}
     }
 
-    // Stats panel
+    // Stats & TRM
     function togglePanel(){
-      const p = document.getElementById('panelEstadisticas');
-      if (p.classList.contains('translate-y-40')) {
-        p.classList.remove('translate-y-40');
-        p.classList.add('translate-y-0');
-        cargarDolarHoy();
-        cargarPreciosContenedores();
-        updateChart();
-      } else {
-        p.classList.remove('translate-y-0');
-        p.classList.add('translate-y-40');
+      const p=document.getElementById('panelEstadisticas');
+      p.classList.toggle('hidden');
+      if(!p.classList.contains('hidden')){
+        cargarDolarHoy(); cargarPreciosContenedores(); updateChart();
       }
     }
     function actualizarEstadisticas(){
-      document.getElementById('totalCargasPanel').textContent = cargas;
-      document.getElementById('promedioTransitoPanel').textContent = '25–35 días';
+      document.getElementById('totalCargasPanel').textContent=cargas;
+      document.getElementById('promedioTransitoPanel').textContent='25–35 días';
     }
-    document.addEventListener('click', e=>{
-      const panel = document.getElementById('panelEstadisticas'),
-            btn   = document.querySelector('.boton-flotante');
-      if (!panel.contains(e.target) && !btn.contains(e.target)) {
-        panel.classList.remove('translate-y-0');
-        panel.classList.add('translate-y-40');
-      }
-    });
+    async function cargarDolarHoy(){
+      try{
+        const r=await fetch('https://api.exchangerate.host/latest?base=USD&symbols=COP'),
+              j=await r.json();
+        document.getElementById('dolarHoy').textContent=j.rates.COP.toFixed(2)+' COP';
+      }catch{document.getElementById('dolarHoy').textContent='Error';}
+    }
+    function cargarPreciosContenedores(){
+      document.getElementById('precio20').textContent='$2 500';
+      document.getElementById('precio40').textContent='$4 200';
+    }
+    document.getElementById('statsBtn').onclick=togglePanel;
 
     // Chart.js
     let chart;
     function initChart(){
-      const ctx = document.getElementById('chartRutas').getContext('2d');
-      chart = new Chart(ctx, {
-        type:'bar',
-        data:{
-          labels:['Shanghai','Qingdao→Busan','Buenaventura'],
-          datasets:[{label:'Veces rastreadas',data:[5,3,8],backgroundColor:'rgba(59,130,246,0.7)'}]
-        },
-        options:{responsive:true,plugins:{legend:{display:false}}}
-      });
+      const ctx=document.getElementById('chartRutas').getContext('2d');
+      chart=new Chart(ctx,{type:'bar',data:{
+        labels:['Shanghai','Qingdao→Busan','Buenaventura'],
+        datasets:[{data:[5,3,8],backgroundColor:'rgba(59,130,246,0.7)'}]
+      },options:{responsive:true,plugins:{legend:{display:false}}}});
     }
-    function updateChart(){ chart && chart.update(); }
+    function updateChart(){chart&&chart.update();}
 
-    // Rest of functions (simulator, chatbot) unchanged...
+    // Chatbot
+    const chatWin=document.getElementById('chatWindow'),
+          chatInput=document.getElementById('chatInput'),
+          chatSend=document.getElementById('chatSend'),
+          chatBody=document.getElementById('chatBody');
+    let shown=false;
+    function toggleChat(){
+      chatWin.classList.toggle('hidden');
+      if(!shown){shown=true;
+        ['¡Bienvenido a Shiptrack!','- Navega usando el menú.','- Pregunta sobre BL, simulador o estadísticas.']
+        .forEach(m=>{const d=document.createElement('div');d.className='chat-bot chat-message';d.textContent=m;chatBody.appendChild(d);});
+      }
+    }
+    document.getElementById('chatBtn').onclick=toggleChat;
+    chatSend.onclick=()=>{
+      const t=chatInput.value.trim(); if(!t) return;
+      const u=document.createElement('div');u.className='chat-user chat-message';u.textContent=t;chatBody.appendChild(u);
+      chatInput.value='';
+      setTimeout(()=>{
+        const b=document.createElement('div');b.className='chat-bot chat-message';
+        b.textContent='Lo siento, no entendí. Prueba: BL, simulador, estadísticas.';
+        chatBody.appendChild(b); chatBody.scrollTop=chatBody.scrollHeight;
+      },300);
+    };
+    chatInput.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();chatSend.click();}});
 
     // Init
-    window.addEventListener('DOMContentLoaded', ()=>{
+    window.addEventListener('DOMContentLoaded',()=>{
       initChart();
       actualizarEstadisticas();
-      // show only Inicio
       document.querySelectorAll('main > section').forEach(s=>s.classList.add('seccion-oculta'));
       document.getElementById('inicio').classList.remove('seccion-oculta');
     });
