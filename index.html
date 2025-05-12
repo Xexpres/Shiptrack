@@ -7,7 +7,7 @@
   <meta name="description" content="Shiptrack: rastrea tu carga marítima y aérea, consulta TRM, simula rutas y peso.">
   <link rel="icon" href="logo-dark.png" type="image/png"/>
 
-  <!-- Tailwind + Tippy.js (tooltips) -->
+  <!-- Tailwind + Tippy for tooltips -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/dist/tippy.css"/>
   <script src="https://unpkg.com/@popperjs/core@2"></script>
@@ -20,6 +20,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
   <style>
     /* Spinner overlay */
     .spinner-overlay {
@@ -47,16 +48,16 @@
   <nav class="bg-blue-600 dark:bg-gray-700 text-white">
     <div class="max-w-6xl mx-auto px-4">
       <div class="flex justify-center space-x-4">
-        <a href="#inicio" class="py-3 px-2 hover:bg-blue-500 rounded" data-tippy-content="Ir a Inicio">Inicio</a>
-        <a href="#simulador" class="py-3 px-2 hover:bg-blue-500 rounded" data-tippy-content="Abrir Simulador">Simulador</a>
-        <a href="#contacto" class="py-3 px-2 hover:bg-blue-500 rounded" data-tippy-content="Formulario de Contacto">Contacto</a>
+        <button id="showInicio" class="py-3 px-2 hover:bg-blue-500 rounded" data-tippy-content="Ir a Inicio">Inicio</button>
+        <button id="showSim" class="py-3 px-2 hover:bg-blue-500 rounded" data-tippy-content="Abrir Simulador">Simulador</button>
+        <button id="showContact" class="py-3 px-2 hover:bg-blue-500 rounded" data-tippy-content="Contacto">Contacto</button>
       </div>
     </div>
   </nav>
 
   <main class="max-w-6xl mx-auto p-4 space-y-6 relative">
 
-    <!-- SECCIÓN INICIO / BL -->
+    <!-- INICIO / BL -->
     <section id="inicio" class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow relative">
       <h2 class="text-2xl font-bold mb-4">Buscar BL</h2>
       <form id="blForm" class="flex items-end gap-4" novalidate>
@@ -85,7 +86,7 @@
       </div>
       <button id="histBtn"
         class="absolute top-6 right-6 bg-gray-200 dark:bg-gray-700 p-2 rounded-full shadow hover:bg-gray-300 dark:hover:bg-gray-600 transition"
-        onclick="toggleHist()" aria-label="Mostrar historial de BL">
+        onclick="toggleHist()" aria-label="Mostrar historial BL">
         <i class="fas fa-history"></i>
       </button>
       <div id="histPanel" class="absolute top-16 right-6 w-64 max-h-64 overflow-auto bg-white dark:bg-gray-800 border rounded-lg shadow-lg hidden z-10">
@@ -95,7 +96,7 @@
     </section>
 
     <!-- MAPA -->
-    <section id="mapaSection" class="h-96 rounded-lg overflow-hidden shadow relative">
+    <section id="mapSection" class="h-96 rounded-lg overflow-hidden shadow relative">
       <div id="mapa" class="h-full"></div>
     </section>
 
@@ -156,7 +157,8 @@
           </label>
         </div>
         <button id="simSubmit" type="submit"
-          class="w-full py-3 bg-green-600 hover:bg-green-700 text-white rounded disabled:opacity-50 transition">
+          class="w-full py-3 bg-green-600 hover:bg-green-700 text-white rounded disabled:opacity-50 transition"
+          data-tippy-content="Simular carga">
           Simular
         </button>
       </form>
@@ -211,9 +213,9 @@
   <footer class="bg-blue-800 dark:bg-gray-800 text-white text-center p-4">© 2025 Shiptrack • Juan Giraldo & Dylan Díaz</footer>
 
   <script>
-    // Persistir tema
+    // Persistir y alternar tema
     const themeToggle = document.getElementById('themeToggle'),
-          themeIcon = document.getElementById('themeIcon');
+          themeIcon   = document.getElementById('themeIcon');
     if(localStorage.darkMode==='enabled'){
       document.documentElement.classList.add('dark');
       themeIcon.classList.replace('fa-moon','fa-sun');
@@ -228,73 +230,77 @@
     // Tooltips
     tippy('[data-tippy-content]');
 
-    // Navegación secciones
-    document.querySelectorAll('nav a').forEach(a=>{
-      a.onclick = e=>{
-        e.preventDefault();
-        document.querySelectorAll('main > section').forEach(sec=>sec.classList.add('hidden'));
-        document.getElementById(a.getAttribute('href').substring(1)).classList.remove('hidden');
-      };
-    });
+    // Secciones
+    const showInicio = document.getElementById('showInicio'),
+          showSim    = document.getElementById('showSim'),
+          showContact= document.getElementById('showContact');
+    showInicio.onclick = ()=>{ toggleSection('inicio'); };
+    showSim.onclick    = ()=>{ toggleSection('simulador'); };
+    showContact.onclick= ()=>{ toggleSection('contacto'); };
+    function toggleSection(id){
+      ['inicio','simulador','contacto'].forEach(sec=>document.getElementById(sec).classList.add('hidden'));
+      document.getElementById(id).classList.remove('hidden');
+    }
 
-    // Leaflet init lazily
-    let mapInitialized = false, map, markers=[], polyline;
+    // Leaflet init
+    let mapInitialized=false, map, markers=[], polyline;
     function initMap(){
       if(mapInitialized) return;
       map = L.map('mapa').setView([20,0],2);
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{ attribution:'© OpenStreetMap' }).addTo(map);
-      mapInitialized = true;
+      mapInitialized=true;
     }
 
-    // BL lógica con spinner + validación
-    const blForm = document.getElementById('blForm'),
-          blInput = document.getElementById('blNumber'),
-          blError = document.getElementById('blError'),
-          blSubmit = document.getElementById('blSubmit'),
-          blLoader = document.getElementById('blLoader');
+    // BL search
+    const blForm    = document.getElementById('blForm'),
+          blInput   = document.getElementById('blNumber'),
+          blError   = document.getElementById('blError'),
+          blSubmit  = document.getElementById('blSubmit'),
+          blLoader  = document.getElementById('blLoader');
+    let cargas=0;
     blForm.onsubmit = async e=>{
       e.preventDefault();
-      blError.classList.add('hidden');
       if(!blInput.checkValidity()){
-        blError.classList.remove('hidden');
-        return;
+        blError.classList.remove('hidden'); return;
       }
-      blSubmit.disabled = true;
+      blError.classList.add('hidden');
+      blSubmit.disabled=true;
       blLoader.classList.remove('hidden');
       initMap();
       await buscarBLPrincipal();
       blLoader.classList.add('hidden');
-      blSubmit.disabled = false;
+      blSubmit.disabled=false;
     };
 
     function resetMapAndTable(){
-      markers.forEach(m=>map.removeLayer(m)); markers = [];
-      if(polyline) map.removeLayer(polyline);
-      const tbody = document.getElementById('tablaEventos');
-      tbody.innerHTML = '<tr><td colspan="3" class="p-4 text-center text-gray-500">No hay datos</td></tr>';
+      markers.forEach(m=>map.removeLayer(m));
+      markers=[]; if(polyline) map.removeLayer(polyline);
+      const tb = document.getElementById('tablaEventos');
+      tb.innerHTML = '<tr><td colspan="3" class="p-4 text-center text-gray-500">No hay datos</td></tr>';
     }
 
     function drawRoute(ruta){
-      const tbody = document.getElementById('tablaEventos');
-      tbody.innerHTML = '';
-      const coords = [];
+      const tb = document.getElementById('tablaEventos');
+      tb.innerHTML = '';
+      const coords=[];
       ruta.forEach(p=>{
-        const m = L.marker(p.coords).addTo(map).bindPopup(`<strong>${p.nombre}</strong><br><small>${p.tiempo}</small>`);
+        const m=L.marker(p.coords).addTo(map).bindPopup(`<strong>${p.nombre}</strong><br>${p.tiempo}`);
         markers.push(m); coords.push(p.coords);
-        const row = tbody.insertRow();
-        row.insertCell(0).textContent = p.nombre;
-        row.insertCell(1).textContent = p.tiempo;
-        row.insertCell(2).textContent = '-';
+        const row=tb.insertRow();
+        row.insertCell(0).textContent=p.nombre;
+        row.insertCell(1).textContent=p.tiempo;
+        row.insertCell(2).textContent='-';
       });
       if(coords.length>1){
-        polyline = L.polyline(coords,{color:'blue'}).addTo(map);
+        polyline=L.polyline(coords,{color:'blue'}).addTo(map);
         map.fitBounds(polyline.getBounds(),{padding:[20,20]});
       } else map.setView(coords[0],5);
+      cargas++; actualizarEstadisticas();
     }
 
     async function buscarBLPrincipal(){
-      const bl = blInput.value.trim();
-      const hist = JSON.parse(localStorage.getItem('busquedas')||'[]');
+      const bl=blInput.value.trim();
+      const hist=JSON.parse(localStorage.getItem('busquedas')||'[]');
       hist.push(bl); localStorage.setItem('busquedas',JSON.stringify(hist));
       resetMapAndTable();
       const rutas = {
@@ -309,123 +315,111 @@
           {nombre:'Buenaventura - Llegada',coords:[3.8801,-77.0312],tiempo:'3 abr 2025'}
         ]
       };
-      if(!rutas[bl]) return alert('BL no reconocido.');
+      if(!rutas[bl]){ alert('BL no reconocido.'); return; }
       drawRoute(rutas[bl]);
-      cargas++; actualizarEstadisticas();
     }
 
-    // Historial
     function loadHistory(){
-      const ul = document.getElementById('histList');
-      ul.innerHTML = '';
-      JSON.parse(localStorage.getItem('busquedas')||'[]').reverse().filter((v,i,self)=>self.indexOf(v)===i)
+      const ul=document.getElementById('histList');
+      ul.innerHTML='';
+      JSON.parse(localStorage.getItem('busquedas')||'[]').reverse()
+        .filter((v,i,self)=>self.indexOf(v)===i)
         .forEach(code=>{
-          const li = document.createElement('li');
-          li.textContent = code;
-          li.className = 'p-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700';
-          li.onclick = ()=>{
-            blInput.value = code; toggleHist(); blForm.requestSubmit();
-          };
+          const li=document.createElement('li');
+          li.textContent=code;
+          li.className='p-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700';
+          li.onclick=()=>{ blInput.value=code; toggleHist(); blForm.requestSubmit(); };
           ul.appendChild(li);
         });
     }
     function toggleHist(){
-      const panel = document.getElementById('histPanel');
-      panel.classList.toggle('hidden');
-      if(!panel.classList.contains('hidden')) loadHistory();
+      const p=document.getElementById('histPanel');
+      p.classList.toggle('hidden');
+      if(!p.classList.contains('hidden')) loadHistory();
     }
 
-    // Simulador with spinner + caching geocode
-    const simForm = document.getElementById('simForm'),
+    // Simulador
+    const simForm   = document.getElementById('simForm'),
           simSubmit = document.getElementById('simSubmit'),
           simLoader = document.getElementById('simLoader');
     simForm.onsubmit = async e=>{
       e.preventDefault();
-      simSubmit.disabled = true;
-      simLoader.classList.remove('hidden');
-      initMap();
-      await simularCarga();
-      simLoader.classList.add('hidden');
-      simSubmit.disabled = false;
+      simSubmit.disabled=true; simLoader.classList.remove('hidden');
+      initMap(); await simularCarga();
+      simLoader.classList.add('hidden'); simSubmit.disabled=false;
     };
     const geoCache = {};
     async function geocode(q){
       if(geoCache[q]) return geoCache[q];
-      const r = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}`);
-      const j = await r.json();
+      const r=await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}`);
+      const j=await r.json();
       if(!j.length) throw 'Ubicación no encontrada';
-      return geoCache[q] = [+j[0].lat,+j[0].lon];
+      return geoCache[q]=[+j[0].lat,+j[0].lon];
     }
-
     function haversine([a1,o1],[a2,o2]){
       const R=6371,d1=(a2-a1)*Math.PI/180,d2=(o2-o1)*Math.PI/180;
       const x=Math.sin(d1/2)**2+Math.cos(a1*Math.PI/180)*Math.cos(a2*Math.PI/180)*Math.sin(d2/2)**2;
       return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));
     }
-
     async function simularCarga(){
-      const modo = document.getElementById('modo').value,
-            o = document.getElementById('origen').value.trim(),
-            d = document.getElementById('destino').value.trim(),
-            p = parseFloat(document.getElementById('peso').value),
-            res = document.getElementById('simuladorResultado');
-      try {
-        const c1 = await geocode(o), c2 = await geocode(d),
-              dist = haversine(c1,c2).toFixed(1),
-              rate = modo==='aereo'?0.05:0.002,
-              cost = (dist * p * rate).toFixed(2);
+      const modo=document.getElementById('modo').value,
+            o=document.getElementById('origen').value.trim(),
+            d=document.getElementById('destino').value.trim(),
+            p=parseFloat(document.getElementById('peso').value),
+            res=document.getElementById('simuladorResultado');
+      try{
+        const c1=await geocode(o),c2=await geocode(d),
+              dist=haversine(c1,c2).toFixed(1),rate=modo==='aereo'?0.05:0.002,
+              cost=(dist*p*rate).toFixed(2);
         resetMapAndTable();
         markers.push(L.marker(c1).addTo(map).bindPopup(o));
         markers.push(L.marker(c2).addTo(map).bindPopup(d));
-        polyline = L.polyline([c1,c2],{color:modo==='aereo'?'red':'green'}).addTo(map);
+        polyline=L.polyline([c1,c2],{color:modo==='aereo'?'red':'green'}).addTo(map);
         map.fitBounds(polyline.getBounds(),{padding:[20,20]});
-        res.innerHTML = `<p>Distancia: ${dist} km</p><p>Costo: $${cost} USD</p>`;
+        res.innerHTML=`<p>Distancia: ${dist} km</p><p>Costo: $${cost} USD</p>`;
       } catch(err){
-        res.textContent = err;
+        res.textContent=err;
       }
     }
 
-    // Estadísticas + TRM caching per day
-    let trmCache = {};
+    // Estadísticas & TRM
+    let trmCache={};
     async function cargarDolarHoy(){
-      const today = new Date().toISOString().slice(0,10);
-      if(trmCache[today]){
-        document.getElementById('trm').textContent = trmCache[today];
-        return;
+      const dia=new Date().toISOString().slice(0,10);
+      if(trmCache[dia]){
+        document.getElementById('trm').textContent=trmCache[dia];
+      } else {
+        try{
+          const r=await fetch('https://www.datos.gov.co/resource/5a63-8mx9.json?$select=valor&$order=fecha%20desc&$limit=1');
+          const j=await r.json(),val=parseFloat(j[0].valor).toFixed(2)+' COP';
+          trmCache[dia]=val;
+          document.getElementById('trm').textContent=val;
+        }catch{ document.getElementById('trm').textContent='Error'; }
       }
-      try {
-        const r = await fetch('https://www.datos.gov.co/resource/5a63-8mx9.json?$select=valor&$order=fecha%20desc&$limit=1');
-        const j = await r.json();
-        const val = parseFloat(j[0].valor).toFixed(2) + ' COP';
-        trmCache[today] = val;
-        document.getElementById('trm').textContent = val;
-      } catch {
-        document.getElementById('trm').textContent = 'Error';
-      }
+    }
+    function cargarPreciosContenedores(){
+      document.getElementById('precio20').textContent='$2,500';
+      document.getElementById('precio40').textContent='$4,200';
+    }
+    function actualizarEstadisticas(){
+      document.getElementById('totalCargasPanel').textContent=cargas;
+      document.getElementById('promedioTransitoPanel').textContent='25–35 días';
     }
     function togglePanel(){
-      const p = document.getElementById('panelEstadisticas');
+      const p=document.getElementById('panelEstadisticas');
       p.classList.toggle('hidden');
       if(!p.classList.contains('hidden')){
-        cargarDolarHoy();
-        cargarPreciosContenedores();
-        updateChart();
+        cargarDolarHoy(); cargarPreciosContenedores(); updateChart();
       }
     }
-    document.getElementById('statsBtn').onclick = togglePanel;
+    document.getElementById('statsBtn').onclick=togglePanel;
 
-    // Contenedor prices
-    function cargarPreciosContenedores(){
-      document.getElementById('precio20').textContent = '$2,500';
-      document.getElementById('precio40').textContent = '$4,200';
-    }
-
-    // Chart.js lazy init
+    // Chart.js
     let chart;
     function initChart(){
       if(chart) return;
-      const ctx = document.getElementById('chartRutas').getContext('2d');
-      chart = new Chart(ctx,{type:'bar',data:{
+      const ctx=document.getElementById('chartRutas').getContext('2d');
+      chart=new Chart(ctx,{type:'bar',data:{
         labels:['Shanghai','Qingdao→Busan','Buenaventura'],
         datasets:[{data:[5,3,8],backgroundColor:'rgba(59,130,246,0.7)'}]
       },options:{plugins:{legend:{display:false}}}});
@@ -442,31 +436,21 @@
       chatWin.classList.toggle('hidden');
       if(!shown){
         shown=true;
-        ['¡Bienvenido a Shiptrack!','Usa el menú para navegar.','Escribe BL, simulador o estadísticas.']
+        ['¡Bienvenido!','Pregunta: BL, simulador o stats.']
           .forEach(m=>{const d=document.createElement('div');d.className='chat-bot chat-message';d.textContent=m;chatBody.appendChild(d);});
       }
     }
-    document.getElementById('chatBtn').onclick = toggleChat;
-    chatSend.onclick = ()=>{
-      const t = chatInput.value.trim();
-      if(!t) return;
-      chatBody.innerHTML += `<div class="chat-user chat-message">${t}</div>`;
+    document.getElementById('chatBtn').onclick=toggleChat;
+    chatSend.onclick=()=>{
+      const t=chatInput.value.trim(); if(!t) return;
+      chatBody.innerHTML+=`<div class="chat-user chat-message">${t}</div>`;
       chatInput.value='';
-      setTimeout(()=>{
-        chatBody.innerHTML += `<div class="chat-bot chat-message">Lo siento, no entendí.</div>`;
-        chatBody.scrollTop = chatBody.scrollHeight;
-      },300);
+      setTimeout(()=>{chatBody.innerHTML+=`<div class="chat-bot chat-message">No entendí.</div>`;chatBody.scrollTop=chatBody.scrollHeight;},300);
     };
-    chatInput.addEventListener('keydown',e=>{ if(e.key==='Enter'){e.preventDefault();chatSend.click();} });
+    chatInput.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();chatSend.click();}});
 
-    // Init on DOMContentLoaded
-    let cargas = 0;
-    function actualizarEstadisticas(){
-      document.getElementById('totalCargasPanel').textContent = cargas;
-      document.getElementById('promedioTransitoPanel').textContent = '25–35 días';
-    }
-
-    document.addEventListener('DOMContentLoaded', ()=>{
+    // Inicialización
+    document.addEventListener('DOMContentLoaded',()=>{
       tippy('[data-tippy-content]');
       initMap();
       actualizarEstadisticas();
@@ -474,3 +458,4 @@
   </script>
 </body>
 </html>
+
