@@ -4,192 +4,316 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Shiptrack - Seguimiento de Carga</title>
+  <!-- Favicon -->
   <link rel="icon" href="assets/logo-dark.png" type="image/png"/>
+
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Leaflet CSS & JS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"/>
   <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <!-- FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous"/>
+  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200">
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 transition-colors">
 
   <!-- HEADER -->
-  <header class="bg-blue-800 dark:bg-gray-800 text-white p-4 flex justify-between items-center">
+  <header class="bg-blue-800 dark:bg-gray-800 text-white p-4 flex justify-between items-center shadow-md">
     <div class="flex items-center space-x-3">
-      <img src="assets/logo-dark.png" class="h-10 w-10" alt="Logo"/>
+      <img src="assets/logo-dark.png" class="h-10 w-10" alt="Shiptrack Logo"/>
       <h1 class="text-xl font-semibold">Shiptrack</h1>
     </div>
-    <button id="themeToggle" class="p-2 rounded hover:bg-blue-700 dark:hover:bg-gray-700">
+    <button id="themeToggle" class="p-2 rounded hover:bg-blue-700 dark:hover:bg-gray-700 transition">
       <i class="fas fa-moon" id="themeIcon"></i>
     </button>
   </header>
 
-  <!-- NAV -->
+  <!-- NAVBAR -->
   <nav class="bg-blue-600 dark:bg-gray-700 text-white">
     <div class="max-w-6xl mx-auto px-4">
       <div class="flex justify-center space-x-4">
-        <a href="#inicio" class="py-3 px-2 hover:bg-blue-500 rounded">Inicio</a>
-        <a href="#simulador" class="py-3 px-2 hover:bg-blue-500 rounded">Simulador</a>
-        <a href="#contacto" class="py-3 px-2 hover:bg-blue-500 rounded">Contacto</a>
+        <a href="#inicio" class="py-3 px-2 hover:bg-blue-500 dark:hover:bg-gray-600 rounded transition">Inicio</a>
+        <a href="#busqueda" class="py-3 px-2 hover:bg-blue-500 dark:hover:bg-gray-600 rounded transition">BL</a>
+        <a href="#simulador" class="py-3 px-2 hover:bg-blue-500 dark:hover:bg-gray-600 rounded transition">Simulador</a>
+        <a href="#mapa" class="py-3 px-2 hover:bg-blue-500 dark:hover:bg-gray-600 rounded transition">Mapa</a>
+        <a href="#contacto" class="py-3 px-2 hover:bg-blue-500 dark:hover:bg-gray-600 rounded transition">Contacto</a>
       </div>
     </div>
   </nav>
 
-  <main class="max-w-4xl mx-auto p-4 space-y-6">
+  <main class="max-w-6xl mx-auto p-4 space-y-6">
 
-    <!-- Buscar BL -->
-    <section id="inicio" class="bg-white dark:bg-gray-800 p-6 rounded shadow relative">
-      <h2 class="text-2xl mb-4 font-bold">Buscar BL</h2>
-      <form class="flex gap-4" onsubmit="return buscarBL();">
-        <div class="flex-1 relative">
-          <input id="blNumber" type="text" placeholder=" " required minlength="6"
-                 class="peer w-full border-b-2 border-gray-300 bg-transparent py-2 px-0 focus:outline-none"/>
+    <!-- BUSCAR BL -->
+    <section id="inicio" class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow relative">
+      <h2 class="text-2xl font-bold mb-4">Buscar BL</h2>
+      <form class="flex items-end gap-4" onsubmit="return buscarBL();">
+        <div class="relative flex-1">
+          <input id="blNumber" type="text" required minlength="6"
+            class="peer w-full border-b-2 border-gray-300 bg-transparent py-2.5 px-0 focus:border-blue-600 outline-none"
+            placeholder=" "/>
           <label for="blNumber"
-                 class="absolute left-0 -top-3.5 text-gray-500 text-sm transition-all peer-placeholder-shown:top-2 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-focus:-top-3.5 peer-focus:text-gray-300">
+            class="absolute left-0 top-3 -translate-y-6 scale-75 transform text-gray-500 duration-300
+                   peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100
+                   peer-focus:-translate-y-6 peer-focus:scale-75">
             Número de BL
           </label>
+          <p class="mt-1 text-sm text-red-600 dark:text-red-400 invisible peer-invalid:visible">
+            Mínimo 6 caracteres.
+          </p>
         </div>
-        <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded">
-          <i class="fas fa-search"></i>
+        <button type="submit" class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded">
+          <i class="fas fa-search"></i> Buscar
         </button>
       </form>
-      <!-- Historial -->
-      <button onclick="toggleHist()" class="absolute top-6 right-6 p-2 bg-gray-200 rounded-full hover:bg-gray-300">
+      <!-- Historial BL -->
+      <button id="histBtn"
+        class="absolute top-6 right-6 bg-gray-200 dark:bg-gray-700 p-2 rounded-full shadow hover:bg-gray-300 dark:hover:bg-gray-600 transition"
+        onclick="toggleHist()" title="Historial">
         <i class="fas fa-history"></i>
       </button>
-      <div id="histPanel" class="absolute top-16 right-6 w-48 max-h-48 overflow-auto bg-white dark:bg-gray-800 border hidden">
-        <ul id="histList"></ul>
+      <div id="histPanel" class="absolute top-16 right-6 w-64 max-h-64 overflow-auto bg-white dark:bg-gray-800 border rounded-lg shadow-lg hidden">
+        <h3 class="p-2 border-b dark:border-gray-700 font-semibold">Historial</h3>
+        <ul id="histList" class="divide-y dark:divide-gray-700"></ul>
       </div>
     </section>
 
-    <!-- Mapa y Tabla -->
-    <div id="mapa" class="h-64 rounded shadow"></div>
-    <section class="bg-white dark:bg-gray-800 p-4 rounded shadow">
-      <h3 class="text-xl mb-2 font-bold">Eventos</h3>
-      <table class="w-full text-left">
+    <!-- MAPA -->
+    <section id="mapa" class="h-96 rounded-lg overflow-hidden shadow"></section>
+
+    <!-- EVENTOS -->
+    <section class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+      <h2 class="text-2xl font-bold mb-4">Eventos de Ruta</h2>
+      <table class="w-full text-left border-collapse">
         <thead>
           <tr>
-            <th class="border-b p-1">Evento</th>
-            <th class="border-b p-1">Fecha</th>
+            <th class="border-b p-2">Puerto / Evento</th>
+            <th class="border-b p-2">Fecha</th>
+            <th class="border-b p-2">Detalle</th>
           </tr>
         </thead>
         <tbody id="tablaEventos"></tbody>
       </table>
     </section>
 
-    <!-- Simulador -->
-    <section id="simulador" class="bg-white dark:bg-gray-800 p-6 rounded shadow hidden">
-      <h2 class="text-2xl font-bold mb-4">Simulador</h2>
-      <!-- ... tu formulario de simulador ... -->
+    <!-- SIMULADOR -->
+    <section id="simulador" class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow hidden">
+      <h2 class="text-2xl font-bold mb-4">Simulador de Carga</h2>
+      <form onsubmit="simularCarga(); return false;" class="space-y-4">
+        <div class="relative z-0 w-full">
+          <select id="modo" class="peer block w-full border-b-2 border-gray-300 bg-transparent py-2.5 px-0 focus:border-blue-600 outline-none" required>
+            <option value="maritimo">Marítimo</option>
+            <option value="aereo">Aéreo</option>
+          </select>
+          <label for="modo" class="absolute top-3 -translate-y-6 scale-75 transform text-gray-500 duration-300 peer-focus:-translate-y-6 peer-focus:scale-75">
+            Modo de Transporte
+          </label>
+        </div>
+        <div class="relative z-0 w-full">
+          <input id="origen" type="text" class="peer block w-full border-b-2 border-gray-300 bg-transparent py-2.5 px-0 focus:border-blue-600 outline-none" placeholder=" " required/>
+          <label for="origen" class="absolute top-3 -translate-y-6 scale-75 transform text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:-translate-y-6 peer-focus:scale-75">
+            Origen
+          </label>
+        </div>
+        <div class="relative z-0 w-full">
+          <input id="destino" type="text" class="peer block w-full border-b-2 border-gray-300 bg-transparent py-2.5 px-0 focus:border-blue-600 outline-none" placeholder=" " required/>
+          <label for="destino" class="absolute top-3 -translate-y-6 scale-75 transform text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:-translate-y-6 peer-focus:scale-75">
+            Destino
+          </label>
+        </div>
+        <div class="relative z-0 w-full">
+          <input id="peso" type="number" min="1" class="peer block w-full border-b-2 border-gray-300 bg-transparent py-2.5 px-0 focus:border-blue-600 outline-none" placeholder=" " required/>
+          <label for="peso" class="absolute top-3 -translate-y-6 scale-75 transform text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:-translate-y-6 peer-focus:scale-75">
+            Peso (kg)
+          </label>
+        </div>
+        <button type="submit" class="w-full py-3 bg-green-600 hover:bg-green-700 text-white rounded">Simular</button>
+      </form>
+      <div id="simuladorResultado" class="mt-4"></div>
     </section>
 
-    <!-- Contacto -->
-    <section id="contacto" class="bg-white dark:bg-gray-800 p-6 rounded shadow hidden">
+    <!-- CONTACTO -->
+    <section id="contacto" class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow hidden">
       <h2 class="text-2xl font-bold mb-4">Contacto</h2>
-      <!-- ... tu formulario de contacto ... -->
+      <form onsubmit="enviarContacto(event)" class="space-y-6">
+        <div class="relative z-0 w-full">
+          <input id="nombre" type="text" class="peer block w-full border-b-2 border-gray-300 bg-transparent py-2.5 px-0 focus:border-blue-600 outline-none" placeholder=" " required/>
+          <label for="nombre" class="absolute top-3 -translate-y-6 scale-75 transform text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:-translate-y-6 peer-focus:scale-75">
+            Tu nombre
+          </label>
+        </div>
+        <div class="relative z-0 w-full">
+          <input id="email" type="email" class="peer block w-full border-b-2 border-gray-300 bg-transparent py-2.5 px-0 focus:border-blue-600 outline-none" placeholder=" " required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"/>
+          <label for="email" class="absolute top-3 -translate-y-6 scale-75 transform text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:-translate-y-6 peer-focus:scale-75">
+            Tu correo electrónico
+          </label>
+        </div>
+        <div class="relative z-0 w-full">
+          <textarea id="mensaje" rows="4" class="peer block w-full border-b-2 border-gray-300 bg-transparent py-2.5 px-0 focus:border-blue-600 outline-none resize-none" placeholder=" " required></textarea>
+          <label for="mensaje" class="absolute top-3 -translate-y-6 scale-75 transform text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:-translate-y-6 peer-focus:scale-75">
+            Tu mensaje
+          </label>
+        </div>
+        <button type="submit" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded">Enviar</button>
+      </form>
     </section>
 
   </main>
 
-  <footer class="bg-blue-800 dark:bg-gray-800 text-white text-center p-4">
-    © 2025 Shiptrack
-  </footer>
+  <!-- PANEL ESTADÍSTICAS -->
+  <div id="panelEstadisticas" class="fixed bottom-6 left-6 w-80 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg hidden">
+    <button class="absolute top-2 right-2 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" onclick="toggleStats()">&times;</button>
+    <h3 class="text-lg font-semibold mb-4">Estadísticas</h3>
+    <p>Cargas rastreadas: <span id="totalCargas">0</span></p>
+    <p>Tiempo tránsito: <span id="promedioTransito">-</span></p>
+    <p>TRM (USD→COP): <span id="trm">Cargando…</span></p>
+    <p>Cont. 20’: <span id="c20">-</span>  Cont. 40’: <span id="c40">-</span></p>
+    <canvas id="chart" class="mt-4"></canvas>
+  </div>
+
+  <!-- BOTONES FLOTANTES -->
+  <button id="btnStats" class="fixed bottom-6 right-6 bg-blue-600 text-white p-4 rounded-full shadow-lg hover:bg-blue-700 transition" onclick="toggleStats()">
+    <i class="fas fa-chart-bar"></i>
+  </button>
+  <button id="btnChat" class="fixed bottom-6 right-24 bg-blue-500 text-white p-4 rounded-full shadow-lg hover:bg-blue-600 transition" onclick="toggleChat()">
+    <i class="fas fa-robot"></i>
+  </button>
+
+  <!-- CHATBOT -->
+  <div id="chatWindow" class="fixed bottom-24 right-24 w-80 max-h-96 bg-white dark:bg-gray-800 rounded-lg shadow-lg hidden flex-col overflow-hidden">
+    <div class="bg-blue-800 dark:bg-gray-700 text-white p-4 font-semibold">Ayuda Shiptrack</div>
+    <div id="chatBody" class="p-4 overflow-y-auto flex flex-col space-y-2"></div>
+    <div class="flex border-t dark:border-gray-700">
+      <input id="chatInput" class="flex-1 p-3 bg-gray-50 dark:bg-gray-700 outline-none" placeholder="Escribe...">
+      <button id="chatSend" class="px-4 bg-blue-600 hover:bg-blue-700 text-white">Enviar</button>
+    </div>
+  </div>
+
+  <footer class="bg-blue-800 dark:bg-gray-800 text-white text-center p-4">© 2025 Shiptrack • Juan Giraldo & Dylan Díaz</footer>
 
   <script>
     // Theme toggle
-    const btnTheme = document.getElementById('themeToggle'),
-          icoTheme = document.getElementById('themeIcon');
-    btnTheme.onclick = () => {
-      document.documentElement.classList.toggle('dark');
-      icoTheme.classList.toggle('fa-sun');
-      icoTheme.classList.toggle('fa-moon');
-    };
+    const tgl = document.getElementById('themeToggle'), ico = document.getElementById('themeIcon');
+    tgl.onclick = () => { document.documentElement.classList.toggle('dark'); ico.classList.toggle('fa-sun'); ico.classList.toggle('fa-moon'); };
 
     // Sections nav
-    document.querySelectorAll('nav a').forEach(a => {
-      a.onclick = e => {
+    document.querySelectorAll('nav a').forEach(a=>{
+      a.onclick = e=>{
         e.preventDefault();
-        document.querySelectorAll('main > section').forEach(s => s.classList.add('hidden'));
-        document.getElementById(a.getAttribute('href').substring(1)).classList.remove('hidden');
-      }
+        document.querySelectorAll('main > section').forEach(s=>s.classList.add('hidden'));
+        const id = a.getAttribute('href').replace('#','');
+        document.getElementById(id).classList.remove('hidden');
+      };
     });
+    // Start on inicio
+    document.getElementById('inicio').classList.remove('hidden');
 
-    // Leaflet init
+    // Leaflet
     const map = L.map('mapa').setView([20,0],2);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-    let markers = [], poly;
-
-    function resetRoute() {
-      markers.forEach(m => map.removeLayer(m));
-      markers = [];
-      if(poly) map.removeLayer(poly);
-      document.getElementById('tablaEventos').innerHTML = '';
-    }
-
-    // BL logic
-    function buscarBL() {
-      const bl = document.getElementById('blNumber').value.trim();
-      if(bl.length < 6) return false;
-
-      // Historial
-      const h = JSON.parse(localStorage.getItem('hist') || '[]');
-      h.push(bl);
-      localStorage.setItem('hist', JSON.stringify(h));
-
-      resetRoute();
-
-      let ruta = [];
-      if (bl === 'MEDUQT871264') {
-        ruta = [
-          { nombre: 'Qingdao - Cargado', coords: [36.0671,120.3826], tiempo: '17 feb 2025' },
-          { nombre: 'Busan - Transbordo', coords: [35.1796,129.0756], tiempo: '22-23 feb 2025' },
-          { nombre: 'Buenaventura - Descarga', coords: [3.8801,-77.0312], tiempo: '25 mar 2025' }
-        ];
-      } else if (bl === '250339340') {
-        ruta = [
-          { nombre: 'Shanghai - Vacío', coords: [31.2304,121.4737], tiempo: '24 feb 2025' },
-          { nombre: 'Salida buque', coords: [31.2304,121.4737], tiempo: '6 mar 2025' },
-          { nombre: 'Buenaventura - Llegada', coords: [3.8801,-77.0312], tiempo: '3 abr 2025' }
-        ];
-      } else {
-        alert('BL no reconocido');
-        return false;
-      }
-
-      // Dibujar
-      const latlngs = [];
-      ruta.forEach(pt => {
-        const m = L.marker(pt.coords).addTo(map).bindPopup(`${pt.nombre}<br>${pt.tiempo}`);
-        markers.push(m);
-        latlngs.push(pt.coords);
-        const tr = document.getElementById('tablaEventos').insertRow();
-        tr.insertCell().textContent = pt.nombre;
-        tr.insertCell().textContent = pt.tiempo;
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{ attribution:'© OpenStreetMap' }).addTo(map);
+    let markers=[], pline, count=0;
+    function reset() { markers.forEach(m=>map.removeLayer(m)); markers=[]; if(pline)map.removeLayer(pline); document.getElementById('tablaEventos').innerHTML=''; }
+    function draw(r) {
+      const pts=[];
+      r.forEach(p=>{
+        const m=L.marker(p.coords).addTo(map).bindPopup(`${p.nombre}<br>${p.tiempo}`);
+        markers.push(m); pts.push(p.coords);
+        const row=document.getElementById('tablaEventos').insertRow();
+        row.insertCell(0).textContent=p.nombre;
+        row.insertCell(1).textContent=p.tiempo;
+        row.insertCell(2).textContent='-';
       });
-      if(latlngs.length>1) {
-        poly = L.polyline(latlngs, { color: 'blue' }).addTo(map);
-        map.fitBounds(poly.getBounds());
-      }
+      if(pts.length>1){ pline=L.polyline(pts,{color:'blue'}).addTo(map); map.fitBounds(pline.getBounds()); }
+      else map.setView(pts[0],5);
+    }
+    function buscarBL(){
+      const bl = document.getElementById('blNumber').value.trim();
+      if(bl.length<6) return false;
+      const h = JSON.parse(localStorage.getItem('busq')||'[]');
+      h.push(bl); localStorage.setItem('busq',JSON.stringify(h));
+      reset();
+      let ruta = bl==='MEDUQT871264'
+        ?[{nombre:'Qingdao',coords:[36.0671,120.3826],tiempo:'17 feb'}]
+        : bl==='250339340'
+        ?[{nombre:'Shanghai',coords:[31.2304,121.4737],tiempo:'24 feb'}]
+        : (alert('BL no')); 
+      draw(ruta); count++; updateStats();
       return false;
     }
-
-    // Historial panel
-    function toggleHist() {
-      const panel = document.getElementById('histPanel'),
-            ul    = document.getElementById('histList');
-      panel.classList.toggle('hidden');
-      if(!panel.classList.contains('hidden')) {
-        ul.innerHTML = '';
-        const h = JSON.parse(localStorage.getItem('hist')||'[]').reverse();
-        [...new Set(h)].forEach(b => {
-          const li = document.createElement('li');
-          li.textContent = b;
-          li.className = 'p-2 hover:bg-gray-200 cursor-pointer';
-          li.onclick = () => { document.getElementById('blNumber').value = b; toggleHist(); buscarBL(); };
+    // History
+    function toggleHist(){
+      const p= document.getElementById('histPanel');
+      if(p.classList.toggle('hidden')){
+        document.getElementById('histList').innerHTML='';
+      } else {
+        const h=JSON.parse(localStorage.getItem('busq')||'[]');
+        const ul=document.getElementById('histList');
+        Array.from(new Set(h.reverse())).forEach(b=>{
+          const li=document.createElement('li');
+          li.textContent=b; li.className='p-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700';
+          li.onclick=()=>{document.getElementById('blNumber').value=b; toggleHist(); buscarBL();};
           ul.appendChild(li);
         });
       }
     }
+
+    // Simulator
+    async function simularCarga(){
+      const modo=document.getElementById('modo').value,
+            o=document.getElementById('origen').value.trim(),
+            d=document.getElementById('destino').value.trim(),
+            p=parseFloat(document.getElementById('peso').value),
+            res=document.getElementById('simuladorResultado');
+      if(!o||!d||isNaN(p)||p<=0){res.textContent='Inválido';return;}
+      res.textContent='Calculando…';
+      try {
+        const geo=async q=>{const r=await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}`);const j=await r.json();if(!j.length)throw'No encontrado';return [+j[0].lat,+j[0].lon];};
+        const a1=await geo(o), a2=await geo(d),
+              R=6371, dLat=(a2[0]-a1[0])*Math.PI/180, dLon=(a2[1]-a1[1])*Math.PI/180,
+              a=Math.sin(dLat/2)**2+Math.cos(a1[0]*Math.PI/180)*Math.cos(a2[0]*Math.PI/180)*Math.sin(dLon/2)**2,
+              dist=2*R*Math.atan2(Math.sqrt(a),Math.sqrt(1-a)), rate=modo==='aereo'?0.05:0.002,
+              cost=(dist*p*rate).toFixed(2);
+        reset(); draw([{nombre:o,coords:a1,tiempo:''},{nombre:d,coords:a2,tiempo:''}]);
+        res.innerHTML=`<h3>${modo}</h3><p>Dist: ${dist.toFixed(1)} km<br>Peso: ${p} kg<br>Cost: $${cost} USD</p>`;
+      } catch(e){ res.textContent=e; }
+    }
+
+    // Stats
+    function toggleStats(){
+      const s=document.getElementById('panelEstadisticas');
+      s.classList.toggle('hidden');
+      if(!s.classList.contains('hidden')) loadStats();
+    }
+    function updateStats(){
+      document.getElementById('totalCargas').textContent=count;
+      document.getElementById('promedioTransito').textContent='25–35 días';
+    }
+    async function loadStats(){
+      try{
+        const r=await fetch('https://api.exchangerate.host/latest?base=USD&symbols=COP'),j=await r.json();
+        document.getElementById('trm').textContent=j.rates.COP.toFixed(2)+' COP';
+      }catch{document.getElementById('trm').textContent='Err';}
+      document.getElementById('c20').textContent='$2,500';
+      document.getElementById('c40').textContent='$4,200';
+      chart.update();
+    }
+
+    // Chart
+    const ctx=document.getElementById('chart').getContext('2d');
+    const chart=new Chart(ctx,{type:'bar',data:{labels:['Qingdao','Shanghai'],datasets:[{data:[1,1],backgroundColor:'rgba(59,130,246,0.7)'}]},options:{plugins:{legend:{display:false}}}});
+
+    // Chat
+    function toggleChat(){ document.getElementById('chatWindow').classList.toggle('hidden'); }
+    document.getElementById('btnChat').onclick=toggleChat;
+    document.getElementById('chatSend').onclick=()=>{
+      const inpt=document.getElementById('chatInput'),t=inpt.value.trim(),bd=document.getElementById('chatBody');
+      if(!t)return; bd.innerHTML+=`<div class="chat-user chat-message">${t}</div>`; inpt.value='';
+      setTimeout(()=>bd.innerHTML+=`<div class="chat-bot chat-message">Inténtalo de nuevo.</div>`,300);
+    };
+
+    // Init
+    window.onload=()=>{ updateStats(); };
   </script>
 </body>
 </html>
