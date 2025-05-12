@@ -23,9 +23,7 @@
       <h1 class="text-xl font-semibold">Shiptrack</h1>
     </div>
     <button id="themeToggle" class="p-2 rounded hover:bg-blue-700 dark:hover:bg-gray-700 transition">
-      <svg id="themeIcon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 20 20">
-        <path d="M17.293 13.293A8 8 0 116.707 2.707a.999.999 0 111.414 1.414A6 6 0 1016 10a.999.999 0 011.293 3.293z"/>
-      </svg>
+      <i class="fas fa-moon" id="themeIcon"></i>
     </button>
   </header>
 
@@ -47,10 +45,25 @@
     <!-- SECCIÓN INICIO / BL -->
     <section id="inicio" class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow hover:shadow-lg transition">
       <h2 class="text-2xl font-bold mb-4">Buscar BL</h2>
-      <div class="flex gap-4">
-        <input id="blInput" type="text" placeholder="Número de BL" class="flex-1 p-3 border rounded bg-gray-50 dark:bg-gray-700"/>
-        <button onclick="buscarBLPrincipal()" class="px-6 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white rounded transition">Buscar</button>
-      </div>
+      <form class="relative z-0 w-full group flex items-end gap-4" onsubmit="return buscarBLSecundario();">
+        <div class="relative w-full">
+          <input
+            id="blNumber" name="blNumber" type="text"
+            class="peer block w-full appearance-none border-0 border-b-2 border-gray-300 bg-transparent py-2.5 px-0 text-gray-900 dark:text-white focus:border-blue-600 focus:outline-none focus:ring-0"
+            placeholder=" " minlength="6" required
+          />
+          <label for="blNumber"
+            class="absolute top-3 -z-10 origin-[0] -translate-y-6 scale-75 transform text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:-translate-y-6 peer-focus:scale-75">
+            Número de BL
+          </label>
+          <p class="mt-2 text-sm text-red-600 dark:text-red-400 invisible peer-invalid:visible">
+            Ingrese al menos 6 caracteres.
+          </p>
+        </div>
+        <button type="submit" class="mb-1 px-6 py-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white rounded transition">
+          <i class="fas fa-search"></i> Buscar
+        </button>
+      </form>
     </section>
 
     <!-- TABLA DE EVENTOS -->
@@ -71,16 +84,72 @@
     <!-- SIMULADOR -->
     <section id="simulador" class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow hover:shadow-lg transition seccion-oculta">
       <h2 class="text-2xl font-bold mb-4">Simulador de Carga</h2>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <select id="modo" class="p-3 border rounded bg-gray-50 dark:bg-gray-700">
-          <option value="maritimo">Marítimo</option>
-          <option value="aereo">Aéreo</option>
-        </select>
-        <input id="origen" type="text" placeholder="Origen" class="p-3 border rounded bg-gray-50 dark:bg-gray-700"/>
-        <input id="destino" type="text" placeholder="Destino" class="p-3 border rounded bg-gray-50 dark:bg-gray-700"/>
-        <input id="peso" type="number" placeholder="Peso (kg)" class="p-3 border rounded bg-gray-50 dark:bg-gray-700"/>
-      </div>
-      <button onclick="simularCarga()" class="mt-4 px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded transition">Simular</button>
+      <form onsubmit="simularCarga(); return false;" class="space-y-4">
+        <!-- Modo -->
+        <div class="relative z-0 w-full group">
+          <select
+            id="modo" name="modo"
+            class="peer block w-full border-0 border-b-2 border-gray-300 bg-transparent py-2.5 px-0 text-gray-900 dark:text-white focus:border-blue-600 focus:outline-none"
+            required>
+            <option value="maritimo">Marítimo</option>
+            <option value="aereo">Aéreo</option>
+          </select>
+          <label
+            for="modo"
+            class="absolute top-3 -z-10 origin-[0] -translate-y-6 scale-75 transform text-gray-500 duration-300 peer-focus:-translate-y-6 peer-focus:scale-75">
+            Modo de Transporte
+          </label>
+        </div>
+        <!-- Origen -->
+        <div class="relative z-0 w-full group">
+          <input
+            id="origen" name="origen" type="text"
+            class="peer block w-full border-0 border-b-2 border-gray-300 bg-transparent py-2.5 px-0 text-gray-900 dark:text-white focus:border-blue-600 focus:outline-none"
+            placeholder=" " required
+          />
+          <label
+            for="origen"
+            class="absolute top-3 -z-10 origin-[0] -translate-y-6 scale-75 transform text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:-translate-y-6 peer-focus:scale-75">
+            Origen
+          </label>
+          <p class="mt-2 text-sm text-red-600 dark:text-red-400 invisible peer-invalid:visible">
+            Campo obligatorio.
+          </p>
+        </div>
+        <!-- Destino -->
+        <div class="relative z-0 w-full group">
+          <input
+            id="destino" name="destino" type="text"
+            class="peer block w-full border-0 border-b-2 border-gray-300 bg-transparent py-2.5 px-0 text-gray-900 dark:text-white focus:border-blue-600 focus:outline-none"
+            placeholder=" " required
+          />
+          <label for="destino"
+            class="absolute top-3 -z-10 origin-[0] -translate-y-6 scale-75 transform text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:-translate-y-6 peer-focus:scale-75">
+            Destino
+          </label>
+          <p class="mt-2 text-sm text-red-600 dark:text-red-400 invisible peer-invalid:visible">
+            Campo obligatorio.
+          </p>
+        </div>
+        <!-- Peso -->
+        <div class="relative z-0 w-full group">
+          <input
+            id="peso" name="peso" type="number" min="1"
+            class="peer block w-full border-0 border-b-2 border-gray-300 bg-transparent py-2.5 px-0 text-gray-900 dark:text-white focus:border-blue-600 focus:outline-none"
+            placeholder=" " required
+          />
+          <label for="peso"
+            class="absolute top-3 -z-10 origin-[0] -translate-y-6 scale-75 transform text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:-translate-y-6 peer-focus:scale-75">
+            Peso (kg)
+          </label>
+          <p class="mt-2 text-sm text-red-600 dark:text-red-400 invisible peer-invalid:visible">
+            Ingresa un valor positivo.
+          </p>
+        </div>
+        <button type="submit" class="w-full py-3 bg-green-600 hover:bg-green-700 text-white rounded transition">
+          Simular
+        </button>
+      </form>
       <div id="simuladorResultado" class="mt-4"></div>
     </section>
 
@@ -90,11 +159,55 @@
     <!-- CONTACTO -->
     <section id="contacto" class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow hover:shadow-lg transition seccion-oculta">
       <h2 class="text-2xl font-bold mb-4">Contacto</h2>
-      <form onsubmit="enviarFormularioPrincipal(event)" class="space-y-4">
-        <input id="nombre" type="text" placeholder="Nombre" class="w-full p-3 border rounded bg-gray-50 dark:bg-gray-700"/>
-        <input id="email" type="email" placeholder="Correo" class="w-full p-3 border rounded bg-gray-50 dark:bg-gray-700"/>
-        <textarea id="mensaje" rows="4" placeholder="Mensaje" class="w-full p-3 border rounded bg-gray-50 dark:bg-gray-700"></textarea>
-        <button type="submit" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded transition">Enviar</button>
+      <form onsubmit="enviarFormularioPrincipal(event)" class="space-y-6">
+        <!-- Nombre -->
+        <div class="relative z-0 w-full group">
+          <input
+            id="nombre" name="nombre" type="text"
+            class="peer block w-full border-0 border-b-2 border-gray-300 bg-transparent py-2.5 px-0 text-gray-900 dark:text-white focus:border-blue-600 focus:outline-none"
+            placeholder=" " required
+          />
+          <label for="nombre"
+            class="absolute top-3 -z-10 origin-[0] -translate-y-6 scale-75 transform text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:-translate-y-6 peer-focus:scale-75">
+            Tu nombre
+          </label>
+          <p class="mt-2 text-sm text-red-600 dark:text-red-400 invisible peer-invalid:visible">
+            Obligatorio.
+          </p>
+        </div>
+        <!-- Email -->
+        <div class="relative z-0 w-full group">
+          <input
+            id="email" name="email" type="email"
+            class="peer block w-full border-0 border-b-2 border-gray-300 bg-transparent py-2.5 px-0 text-gray-900 dark:text-white focus:border-blue-600 focus:outline-none"
+            placeholder=" " required
+            pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
+          />
+          <label for="email"
+            class="absolute top-3 -z-10 origin-[0] -translate-y-6 scale-75 transform text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:-translate-y-6 peer-focus:scale-75">
+            Tu correo electrónico
+          </label>
+          <p class="mt-2 text-sm text-red-600 dark:text-red-400 invisible peer-invalid:visible">
+            Ingresa un email válido.
+          </p>
+        </div>
+        <!-- Mensaje -->
+        <div class="relative z-0 w-full group"> 
+          <textarea
+            id="mensaje" name="mensaje" rows="4"
+            class="peer block w-full border-0 border-b-2 border-gray-300 bg-transparent py-2.5 px-0 text-gray-900 dark:text-white focus:border-blue-600 focus:outline-none resize-none"
+            placeholder=" " required></textarea>
+          <label for="mensaje"
+            class="absolute top-3 -z-10 origin-[0] -translate-y-6 scale-75 transform text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:-translate-y-6 peer-focus:scale-75">
+            Tu mensaje
+          </label>
+          <p class="mt-2 text-sm text-red-600 dark:text-red-400 invisible peer-invalid:visible">
+            Obligatorio.
+          </p>
+        </div>
+        <button type="submit" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded transition">
+          Enviar mensaje
+        </button>
       </form>
     </section>
 
@@ -112,8 +225,12 @@
   </div>
 
   <!-- BOTONES FLOTANTES -->
-  <button class="boton-flotante" onclick="togglePanel()"><i class="fas fa-chart-bar"></i></button>
-  <button class="chatbot-button" onclick="toggleChat()"><i class="fas fa-robot"></i></button>
+  <button class="boton-flotante fixed bottom-6 right-6 bg-blue-600 text-white p-4 rounded-full shadow-lg hover:bg-blue-700 transition" onclick="togglePanel()">
+    <i class="fas fa-chart-bar"></i>
+  </button>
+  <button class="chatbot-button fixed bottom-6 right-24 bg-blue-500 text-white p-4 rounded-full shadow-lg hover:bg-blue-600 transition" onclick="toggleChat()">
+    <i class="fas fa-robot"></i>
+  </button>
 
   <!-- CHATBOT -->
   <div id="chatWindow" class="fixed bottom-24 right-24 w-80 max-h-96 bg-white dark:bg-gray-800 rounded-lg shadow-lg hidden flex-col overflow-hidden">
@@ -129,8 +246,13 @@
 
   <script>
     // Theme toggle
-    const themeToggle = document.getElementById('themeToggle');
-    themeToggle.onclick = () => document.documentElement.classList.toggle('dark');
+    const themeToggle = document.getElementById('themeToggle'),
+          themeIcon = document.getElementById('themeIcon');
+    themeToggle.onclick = () => {
+      document.documentElement.classList.toggle('dark');
+      themeIcon.classList.toggle('fa-sun');
+      themeIcon.classList.toggle('fa-moon');
+    };
 
     // Initialize map
     const map = L.map('mapa').setView([20,0],2);
@@ -161,7 +283,7 @@
       } else map.setView(coords[0],5);
     }
     function buscarBLPrincipal() {
-      const bl=document.getElementById("blInput").value.trim();
+      const bl=document.getElementById("blNumber").value.trim();
       if(!bl||bl.length<6) return alert("BL inválido.");
       resetMapAndTable();
       let ruta=[];
@@ -258,8 +380,7 @@
       const p=document.getElementById("panelEstadisticas");
       p.classList.toggle("activo");
       if(p.classList.contains("activo")){
-        cargarDolarHoy(); cargarPreciosContenedores();
-        updateChart();
+        cargarDolarHoy(); cargarPreciosContenedores(); updateChart();
       }
     }
     function actualizarEstadisticas(){
@@ -267,9 +388,8 @@
       document.getElementById("promedioTransitoPanel").textContent='25–35 días';
     }
     document.addEventListener('click',e=>{
-      const panel=document.getElementById("panelEstadisticas"),
-            btn=document.querySelector(".boton-flotante");
-      if(panel.classList.contains("activo")&&!panel.contains(e.target)&&!btn.contains(e.target))
+      const panel=document.getElementById("panelEstadisticas"), btn=document.querySelector(".boton-flotante");
+      if(panel.classList.contains("activo") && !panel.contains(e.target) && !btn.contains(e.target))
         panel.classList.remove("activo");
     });
 
@@ -292,9 +412,7 @@
         datasets:[{label:'Veces rastreadas',data:[5,3,8],backgroundColor:'rgba(59,130,246,0.7)'}]
       },options:{responsive:true,plugins:{legend:{display:false}}}});
     }
-    function updateChart(){
-      if(chart) chart.update();
-    }
+    function updateChart(){ if(chart) chart.update(); }
 
     // Chatbot
     const chatWindow=document.getElementById('chatWindow'),
@@ -319,21 +437,23 @@
       m.textContent=text; chatBody.appendChild(m); chatBody.scrollTop=chatBody.scrollHeight;
     }
     chatSend.addEventListener('click',()=>{
-      const t=chatInput.value.trim(); if(!t)return;
+      const t=chatInput.value.trim(); if(!t) return;
       appendMessage(t,'user'); chatInput.value='';
       setTimeout(()=>{
-        let r;if(/crear cuenta|registro/.test(t.toLowerCase())) r='Ve a "Mi Cuenta" e inicia sesión.';
-        else if(/bl|conocimiento/.test(t.toLowerCase())) r='Usa sección "BL" con tu número completo.';
-        else if(/simulador/.test(t.toLowerCase())) r='Selecciona modo, origen, destino, peso y Simular.';
-        else if(/estadística|dólar|contenedor/.test(t.toLowerCase())) r='Panel muestra búsquedas, dólar y precios contenedores.';
-        else if(/hola|buenos/.test(t.toLowerCase())) r='¡Hola! ¿Cómo puedo ayudarte?';
+        let r;
+        const l=t.toLowerCase();
+        if(/crear cuenta|registro/.test(l)) r='Ve a "Mi Cuenta" e inicia sesión.';
+        else if(/bl|conocimiento/.test(l)) r='Usa sección "BL" con tu número completo.';
+        else if(/simulador/.test(l)) r='Selecciona modo, origen, destino, peso y Simular.';
+        else if(/estadística|dólar|contenedor/.test(l)) r='Panel muestra búsquedas, dólar y precios contenedores.';
+        else if(/hola|buenos/.test(l)) r='¡Hola! ¿Cómo puedo ayudarte?';
         else r='No entendí. Prueba: crear cuenta, BL, simulador, estadísticas.';
         appendMessage(r,'bot');
       },300);
     });
-    chatInput.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();chatSend.click();}});
+    chatInput.addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); chatSend.click(); } });
 
-    // Init on load
+    // Init
     window.addEventListener('DOMContentLoaded',()=>{
       initChart();
       actualizarEstadisticas();
