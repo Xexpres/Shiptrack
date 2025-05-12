@@ -6,7 +6,6 @@
   <title>Shiptrack - Seguimiento de Carga</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous"/>
-  <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/1063/1063191.png" />
   <style>
     body { font-family: Arial, sans-serif; margin:0; padding:0; background:#f4f4f4 }
     header { background:#003366; color:#fff; padding:15px; text-align:center }
@@ -15,7 +14,7 @@
     nav a:hover { text-decoration:underline }
     .contenedor { max-width:1000px; margin:20px auto; background:#fff; padding:20px; border-radius:8px; box-shadow:0 4px 8px rgba(0,0,0,0.1); text-align:center }
     .seccion-oculta { display:none }
-    input, button, textarea { width:100%; padding:10px; margin:10px 0; border:1px solid #ddd; border-radius:4px }
+    input, button, textarea, select { width:100%; padding:10px; margin:10px 0; border:1px solid #ddd; border-radius:4px }
     button { background:#003366; color:#fff; border:none; cursor:pointer }
     button:hover { background:#002244 }
     #mapa { margin:20px auto; width:90%; height:500px }
@@ -32,64 +31,18 @@
     #panelEstadisticas .cerrar-panel { background:none; border:none; font-size:20px; position:absolute; top:8px; right:10px; cursor:pointer; color:#888 }
     #panelEstadisticas .cerrar-panel:hover { color:#333 }
 
-    /* Chatbot flotante */
+    /* Chatbot */
     .chatbot-button { position:fixed; bottom:20px; right:100px; background:#0077cc; color:#fff; border:none; border-radius:50%; width:60px; height:60px; font-size:24px; cursor:pointer; box-shadow:0 4px 8px rgba(0,0,0,0.3); z-index:1000; transition:0.3s }
     .chatbot-button:hover { background:#005fa3; transform:scale(1.1) }
-
-    #chatWindow {
-      position:fixed;
-      bottom:90px;
-      right:100px;
-      width:320px;
-      max-height:450px;
-      background:#fff;
-      border-radius:8px;
-      box-shadow:0 4px 12px rgba(0,0,0,0.2);
-      display:none;
-      flex-direction:column;
-      overflow:hidden;
-      z-index:1000;
-    }
-    #chatHeader {
-      background:#003366;
-      color:#fff;
-      padding:10px;
-      font-weight:bold;
-    }
-    #chatBody {
-      flex:1;
-      padding:10px;
-      overflow-y:auto;
-      background:#f9f9f9;
-      display:flex;
-      flex-direction:column;
-    }
-    .chat-message {
-      margin:5px 0;
-      padding:8px;
-      border-radius:4px;
-      max-width:80%;
-      word-wrap:break-word;
-    }
-    .chat-user { background:#d1e7fd; align-self:flex-end; }
-    .chat-bot  { background:#e5e5e5; align-self:flex-start; }
-    #chatInputContainer {
-      display:flex;
-      border-top:1px solid #ddd;
-    }
-    #chatInput {
-      flex:1;
-      border:none;
-      padding:10px;
-      outline:none;
-    }
-    #chatSend {
-      background:#003366;
-      color:#fff;
-      border:none;
-      padding:0 16px;
-      cursor:pointer;
-    }
+    #chatWindow { position:fixed; bottom:90px; right:100px; width:320px; max-height:450px; background:#fff; border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,0.2); display:none; flex-direction:column; overflow:hidden; z-index:1000 }
+    #chatHeader { background:#003366; color:#fff; padding:10px; font-weight:bold }
+    #chatBody { flex:1; padding:10px; overflow-y:auto; background:#f9f9f9; display:flex; flex-direction:column }
+    .chat-message { margin:5px 0; padding:8px; border-radius:4px; max-width:80%; word-wrap:break-word }
+    .chat-user { background:#d1e7fd; align-self:flex-end }
+    .chat-bot  { background:#e5e5e5; align-self:flex-start }
+    #chatInputContainer { display:flex; border-top:1px solid #ddd }
+    #chatInput { flex:1; border:none; padding:10px; outline:none }
+    #chatSend { background:#003366; color:#fff; border:none; padding:0 16px; cursor:pointer }
   </style>
 </head>
 <body>
@@ -109,13 +62,11 @@
     <a href="#cuenta">Mi Cuenta</a>
   </nav>
 
-  <!-- Inicio -->
   <div id="inicio" class="contenedor">
     <input type="text" id="blInput" placeholder="Ingrese su número de BL" required>
     <button onclick="buscarBLPrincipal()">Buscar</button>
   </div>
 
-  <!-- Búsqueda secundaria BL -->
   <div id="busqueda" class="contenedor seccion-oculta">
     <h2>Buscar conocimiento de embarque (BL)</h2>
     <form onsubmit="return buscarBLSecundario();">
@@ -125,10 +76,8 @@
     <div id="resultContainer">Introduce un número BL para ver resultados aquí.</div>
   </div>
 
-  <!-- Mapa -->
   <div id="mapa"></div>
 
-  <!-- Tabla de eventos BL -->
   <table>
     <thead>
       <tr><th>Puerto / Evento</th><th>Fecha / Tránsito</th><th>Detalle</th></tr>
@@ -136,19 +85,21 @@
     <tbody id="tablaEventos"></tbody>
   </table>
 
-  <!-- Simulador dinámico -->
   <div id="simulador" class="contenedor seccion-oculta">
     <h2>Simulador de carga dinámico</h2>
     <form onsubmit="simularCarga(); return false;">
-      <input type="text" id="origen" placeholder="Origen (país, ciudad o puerto)" required>
-      <input type="text" id="destino" placeholder="Destino (país, ciudad o puerto)" required>
+      <select id="modo" required>
+        <option value="maritimo">Marítimo</option>
+        <option value="aereo">Aéreo</option>
+      </select>
+      <input type="text" id="origen" placeholder="Origen (ciudad, puerto o país)" required>
+      <input type="text" id="destino" placeholder="Destino (ciudad, puerto o país)" required>
       <input type="number" id="peso" placeholder="Peso estimado (kg)" required>
       <button type="submit">Simular</button>
     </form>
     <div id="simuladorResultado"></div>
   </div>
 
-  <!-- Área de Usuario -->
   <div id="usuario" class="contenedor seccion-oculta">
     <h2>Área de Usuario</h2>
     <form onsubmit="iniciarSesion(); return false;">
@@ -159,7 +110,6 @@
     <div id="usuarioMensaje"></div>
   </div>
 
-  <!-- Contacto -->
   <div id="contacto" class="formulario-contacto seccion-oculta">
     <h2>Contacto</h2>
     <form onsubmit="enviarFormularioPrincipal(event);">
@@ -171,19 +121,16 @@
     <p>O escríbenos a <strong>soporte@shiptrack.com</strong> o por <a href="https://wa.me/1234567890" target="_blank">WhatsApp</a></p>
   </div>
 
-  <!-- Ayuda -->
   <div id="ayuda" class="contenedor seccion-oculta">
     <h2>Ayuda</h2>
     <p>Preguntas frecuentes e información de uso.</p>
   </div>
 
-  <!-- Mi Cuenta -->
   <div id="cuenta" class="contenedor seccion-oculta">
     <h2>Mi Cuenta</h2>
     <p>Funcionalidad futura: guarda BL, notificaciones, etc.</p>
   </div>
 
-  <!-- Panel de estadísticas -->
   <div id="panelEstadisticas">
     <button class="cerrar-panel" onclick="togglePanel()">&times;</button>
     <h3><i class="fas fa-chart-bar"></i> Estadísticas</h3>
@@ -191,12 +138,14 @@
     <p>Rutas comunes:</p>
     <ul id="rutasComunesPanel"></ul>
     <p>Tiempo promedio tránsito: <span id="promedioTransitoPanel">-</span></p>
+    <p>Cotización USD (hoy): <span id="dolarHoy">Cargando…</span></p>
+    <p>Precio contenedor 20’: <span id="precio20">Cargando…</span></p>
+    <p>Precio contenedor 40’: <span id="precio40">Cargando…</span></p>
   </div>
 
   <button class="boton-flotante" onclick="togglePanel()"><i class="fas fa-chart-bar"></i></button>
   <button class="chatbot-button" onclick="toggleChat()"><i class="fas fa-robot"></i></button>
 
-  <!-- Ventana de chat -->
   <div id="chatWindow">
     <div id="chatHeader">Ayuda de Shiptrack</div>
     <div id="chatBody"></div>
@@ -212,6 +161,7 @@
 
   <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
   <script>
+    // Mapa
     const map = L.map('mapa').setView([20, 0], 2);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; OpenStreetMap contributors'
@@ -222,12 +172,8 @@
     // BL
     function buscarBLPrincipal() {
       const bl = document.getElementById("blInput").value.trim();
-      if (!bl || bl.length < 6) return alert("Por favor ingresa un BL válido (mínimo 6 caracteres).");
-      document.getElementById("tablaEventos").innerHTML = "";
-      markers.forEach(m => map.removeLayer(m));
-      if (polyline) map.removeLayer(polyline);
-      markers = [];
-
+      if (!bl || bl.length < 6) return alert("BL inválido (mínimo 6 caracteres).");
+      resetMapAndTable();
       let ruta = [];
       if (bl === "MEDUQT871264") {
         ruta = [
@@ -244,7 +190,22 @@
       } else {
         return alert("BL no reconocido.");
       }
-
+      drawRoute(ruta);
+      cargas++; actualizarEstadisticas();
+    }
+    function buscarBLSecundario() {
+      const bl = document.getElementById("blNumber").value.trim();
+      document.getElementById("blInput").value = bl;
+      buscarBLPrincipal();
+      return false;
+    }
+    function resetMapAndTable() {
+      document.getElementById("tablaEventos").innerHTML = "";
+      markers.forEach(m => map.removeLayer(m));
+      if (polyline) map.removeLayer(polyline);
+      markers = [];
+    }
+    function drawRoute(ruta) {
       const coords = [];
       ruta.forEach(p => {
         const m = L.marker(p.coords).addTo(map).bindPopup(`<strong>${p.nombre}</strong><br>${p.tiempo}`);
@@ -261,18 +222,9 @@
       } else {
         map.setView(coords[0], 5);
       }
-      cargas++;
-      actualizarEstadisticas();
     }
 
-    function buscarBLSecundario() {
-      const bl = document.getElementById("blNumber").value.trim();
-      document.getElementById("blInput").value = bl;
-      buscarBLPrincipal();
-      return false;
-    }
-
-    // Geocoding + Haversine
+    // Geocoding + distancia
     async function geocode(place) {
       const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(place)}`);
       const data = await res.json();
@@ -287,47 +239,45 @@
 
     // Simulador
     async function simularCarga() {
-      const origen = document.getElementById("origen").value.trim();
+      const modo    = document.getElementById("modo").value;
+      const origen  = document.getElementById("origen").value.trim();
       const destino = document.getElementById("destino").value.trim();
-      const peso = parseFloat(document.getElementById("peso").value);
-      const resDiv = document.getElementById("simuladorResultado");
+      const peso    = parseFloat(document.getElementById("peso").value);
+      const resDiv  = document.getElementById("simuladorResultado");
       if (!origen||!destino||isNaN(peso)||peso<=0) {
         return void(resDiv.textContent = 'Por favor ingresa datos válidos.');
       }
       resDiv.textContent = 'Calculando…';
       try {
         const c1 = await geocode(origen), c2 = await geocode(destino);
-        const distKm = haversine(c1, c2).toFixed(1);
-        if (polyline) map.removeLayer(polyline);
-        markers.forEach(m => map.removeLayer(m));
-        markers = [];
+        const dist = haversine(c1, c2).toFixed(1);
+        resetMapAndTable();
         markers.push(L.marker(c1).addTo(map).bindPopup(origen));
         markers.push(L.marker(c2).addTo(map).bindPopup(destino));
-        polyline = L.polyline([c1, c2], { color: 'green' }).addTo(map);
+        polyline = L.polyline([c1, c2], { color: modo==='aereo'?'red':'green' }).addTo(map);
         map.fitBounds(polyline.getBounds(), { padding: [50,50] });
-        const rate = 0.002;
-        const costo = (distKm * peso * rate).toFixed(2);
+        const rate = modo==='aereo'?0.05:0.002;
+        const costo = (dist * peso * rate).toFixed(2);
         resDiv.innerHTML = `
-          <h3>Resultado de simulación</h3>
+          <h3>Simulación (${modo})</h3>
           <ul>
-            <li><b>Origen:</b> ${origen}</li>
-            <li><b>Destino:</b> ${destino}</li>
-            <li><b>Distancia:</b> ${distKm} km</li>
+            <li><b>Distancia:</b> ${dist} km</li>
             <li><b>Peso:</b> ${peso} kg</li>
+            <li><b>Tarifa:</b> $${rate} USD/(kg·km)</li>
           </ul>
           <h3>Costo estimado: $${costo} USD</h3>
         `;
-      } catch (err) {
-        resDiv.textContent = err.message;
+      } catch (e) {
+        resDiv.textContent = e.message;
       }
     }
 
-    // Usuario + Contacto
+    // Usuario y contacto
     function iniciarSesion() {
       const u = document.getElementById("usuarioNombre").value;
       const p = document.getElementById("usuarioClave").value;
       document.getElementById("usuarioMensaje").textContent =
-        (u==='admin'&&p==='1234')? 'Inicio exitoso.' : 'Usuario o contraseña incorrecta.';
+        (u==='admin'&&p==='1234')?'Inicio exitoso.':'Usuario o contraseña incorrecta.';
     }
     function enviarFormularioPrincipal(e) {
       e.preventDefault();
@@ -336,39 +286,54 @@
       e.target.reset();
     }
 
-    // Estadísticas
+    // Estadísticas y contenedores
+    async function cargarDolarHoy() {
+      try {
+        const res = await fetch('https://api.exchangerate.host/latest?base=USD&symbols=COP');
+        const json = await res.json();
+        document.getElementById('dolarHoy').textContent = `1 USD = ${json.rates.COP.toFixed(2)} COP`;
+      } catch {
+        document.getElementById('dolarHoy').textContent = 'Error';
+      }
+    }
+    function cargarPreciosContenedores() {
+      document.getElementById('precio20').textContent = '$2 500 USD';
+      document.getElementById('precio40').textContent = '$4 200 USD';
+    }
     function togglePanel() {
-      document.getElementById("panelEstadisticas").classList.toggle("activo");
+      const p = document.getElementById("panelEstadisticas");
+      p.classList.toggle("activo");
+      if (p.classList.contains("activo")) {
+        cargarDolarHoy();
+        cargarPreciosContenedores();
+      }
     }
     function actualizarEstadisticas() {
       document.getElementById("totalCargasPanel").textContent = cargas;
-      const ul = document.getElementById("rutasComunesPanel");
-      ul.innerHTML = '';
-      ['Shanghai - Buenaventura','Qingdao - Busan - Buenaventura'].forEach(r=>{
-        const li = document.createElement('li'); li.textContent = r;
-        ul.appendChild(li);
+      const ul = document.getElementById("rutasComunesPanel"); ul.innerHTML = '';
+      ['Shanghai – Buenaventura','Qingdao – Busan – Buenaventura'].forEach(r => {
+        const li = document.createElement('li'); li.textContent = r; ul.appendChild(li);
       });
       document.getElementById("promedioTransitoPanel").textContent = '25–35 días';
     }
     document.addEventListener('click', e => {
       const panel = document.getElementById("panelEstadisticas");
-      const btn = document.querySelector(".boton-flotante");
+      const btn   = document.querySelector(".boton-flotante");
       if (panel.classList.contains("activo") && !panel.contains(e.target) && !btn.contains(e.target)) {
         panel.classList.remove("activo");
       }
     });
 
-    // Navegación
+    // Navegación secciones
     document.querySelectorAll('nav a').forEach(link => {
       link.addEventListener('click', e => {
         e.preventDefault();
-        document.querySelectorAll('.contenedor, .formulario-contacto')
-          .forEach(sec => sec.classList.add('seccion-oculta'));
+        document.querySelectorAll('.contenedor, .formulario-contacto').forEach(s => s.classList.add('seccion-oculta'));
         const id = link.getAttribute('href').substring(1);
         const sec = document.getElementById(id);
         if (sec) {
           sec.classList.remove('seccion-oculta');
-          window.scrollTo({ top: sec.offsetTop-50, behavior: 'smooth' });
+          window.scrollTo({ top: sec.offsetTop - 50, behavior: 'smooth' });
         }
       });
     });
@@ -379,7 +344,6 @@
     const chatInput  = document.getElementById('chatInput');
     const chatSend   = document.getElementById('chatSend');
     let showedInitial = false;
-
     function toggleChat() {
       if (chatWindow.style.display === 'flex') {
         chatWindow.style.display = 'none';
@@ -387,58 +351,39 @@
         chatWindow.style.display = 'flex';
         if (!showedInitial) {
           showedInitial = true;
-          appendMessage('¡Bienvenido a Shiptrack! Aquí tienes algunas opciones de ayuda:', 'bot');
-          appendMessage('- Crear una cuenta: ve a "Mi Cuenta" y sigue los pasos.', 'bot');
-          appendMessage('- Buscar un BL: usa la sección "BL" para ingresar tu número.', 'bot');
-          appendMessage('- Usar el simulador: en "Simulador", ingresa origen, destino y peso.', 'bot');
-          appendMessage('- Ver estadísticas: haz clic en el gráfico flotante para abrir el panel.', 'bot');
+          ['¡Bienvenido a Shiptrack! Aquí tienes ayuda:','- Crear cuenta: pestaña "Mi Cuenta".','- Buscar BL: pestaña "BL".','- Simulador: pestaña "Simulador".','- Estadísticas: botón flotante.']
+          .forEach(msg => appendMessage(msg,'bot'));
         }
       }
     }
-
-    function appendMessage(text, sender) {
+    function appendMessage(text,sender) {
       const msg = document.createElement('div');
-      msg.classList.add('chat-message', sender === 'user' ? 'chat-user' : 'chat-bot');
+      msg.classList.add('chat-message', sender==='user'?'chat-user':'chat-bot');
       msg.textContent = text;
       chatBody.appendChild(msg);
       chatBody.scrollTop = chatBody.scrollHeight;
     }
-
-    chatSend.addEventListener('click', () => {
-      const text = chatInput.value.trim();
-      if (!text) return;
-      appendMessage(text, 'user');
-      chatInput.value = '';
-      setTimeout(() => {
-        let respuesta;
-        const t = text.toLowerCase();
-        if (/crear cuenta|registro/.test(t)) {
-          respuesta = 'Para crear una cuenta, ve a la pestaña "Mi Cuenta", ingresa tu usuario y contraseña, y presiona "Iniciar sesión".';
-        } else if (/bl|conocimiento/.test(t)) {
-          respuesta = 'Para buscar tu BL, ve a "BL" e ingresa tu número completo (mínimo 6 caracteres).';
-        } else if (/simulador/.test(t)) {
-          respuesta = 'En "Simulador", ingresa origen, destino y peso (kg), luego haz clic en "Simular" para ver distancia y costo.';
-        } else if (/estadística|panel/.test(t)) {
-          respuesta = 'El panel de estadísticas muestra número de búsquedas, rutas frecuentes y tiempos promedio de tránsito.';
-        } else if (/hola|buenos/.test(t)) {
-          respuesta = '¡Hola! ¿En qué puedo ayudarte?';
-        } else {
-          respuesta = 'Lo siento, no entendí. Prueba con: "crear cuenta", "BL", "simulador" o "estadísticas".';
-        }
-        appendMessage(respuesta, 'bot');
-      }, 300);
+    chatSend.addEventListener('click',()=>{
+      const txt=chatInput.value.trim(); if(!txt) return;
+      appendMessage(txt,'user'); chatInput.value='';
+      setTimeout(()=>{
+        let r;
+        const t=txt.toLowerCase();
+        if(/crear cuenta|registro/.test(t)) r='Ve a "Mi Cuenta" e inicia sesión o regístrate.';
+        else if(/bl|conocimiento/.test(t)) r='En "BL" ingresa tu número completo para ver ruta.';
+        else if(/simulador/.test(t)) r='Selecciona modo, origen, destino, peso y clic en Simular.';
+        else if(/estadística|dólar|contenedor/.test(t)) r='El panel muestra búsquedas, dólar hoy y precios 20’/40’.';
+        else if(/hola|buenos/.test(t)) r='¡Hola! ¿Cómo puedo ayudarte?';
+        else r='No entendí. Usa: crear cuenta, BL, simulador, estadísticas.';
+        appendMessage(r,'bot');
+      },300);
+    });
+    chatInput.addEventListener('keydown',e=>{
+      if(e.key==='Enter'){e.preventDefault();chatSend.click();}
     });
 
-    chatInput.addEventListener('keydown', e => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        chatSend.click();
-      }
-    });
-
-    // Inicializar estadísticas
+    // Inicial
     actualizarEstadisticas();
   </script>
 </body>
 </html>
-
