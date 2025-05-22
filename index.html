@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="es" class="dark">
 <head>
@@ -7,7 +8,7 @@
   <meta name="description" content="Shiptrack: rastrea tu carga marítima y aérea, consulta TRM, simula rutas y peso.">
   <link rel="icon" href="logo-dark.png" type="image/png"/>
 
-  <!-- Tailwind + Tippy for tooltips -->
+  <!-- Tailwind + Tippy para tooltips -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/dist/tippy.css"/>
   <script src="https://unpkg.com/@popperjs/core@2"></script>
@@ -31,21 +32,21 @@
     }
   </style>
 </head>
-<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 transition-colors">
+<body class="bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-100 transition-colors">
 
   <!-- HEADER -->
-  <header class="bg-blue-800 dark:bg-gray-800 text-white p-4 flex justify-between items-center shadow-md">
+  <header class="bg-blue-800 dark:bg-gray-700 text-white p-4 flex justify-between items-center shadow-md">
     <div class="flex items-center space-x-3">
       <img src="logo-dark.png" class="h-10 w-10" alt="Shiptrack Logo"/>
       <h1 class="text-xl font-semibold">Shiptrack</h1>
     </div>
-    <button id="themeToggle" aria-label="Alternar modo claro/oscuro" class="p-2 rounded hover:bg-blue-700 dark:hover:bg-gray-700 transition">
+    <button id="themeToggle" aria-label="Alternar modo claro/oscuro" class="p-2 rounded hover:bg-blue-700 dark:hover:bg-gray-600 transition">
       <i class="fas fa-moon" id="themeIcon"></i>
     </button>
   </header>
 
   <!-- NAVBAR -->
-  <nav class="bg-blue-600 dark:bg-gray-700 text-white">
+  <nav class="bg-blue-600 dark:bg-gray-600 text-white">
     <div class="max-w-6xl mx-auto px-4">
       <div class="flex justify-center space-x-4">
         <button id="showInicio" class="py-3 px-2 hover:bg-blue-500 rounded" data-tippy-content="Ir a Inicio">Inicio</button>
@@ -57,8 +58,8 @@
 
   <main class="max-w-6xl mx-auto p-4 space-y-6 relative">
 
-    <!-- INICIO / BL -->
-    <section id="inicio" class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow relative">
+    <!-- SECCIÓN INICIO -->
+    <section id="inicio" class="bg-white dark:bg-gray-700 p-6 rounded-lg shadow relative">
       <h2 class="text-2xl font-bold mb-4">Buscar BL</h2>
       <form id="blForm" class="flex items-end gap-4" novalidate>
         <div class="relative flex-1">
@@ -89,9 +90,9 @@
         onclick="toggleHist()" aria-label="Mostrar historial BL">
         <i class="fas fa-history"></i>
       </button>
-      <div id="histPanel" class="absolute top-16 right-6 w-64 max-h-64 overflow-auto bg-white dark:bg-gray-800 border rounded-lg shadow-lg hidden z-10">
-        <h3 class="p-2 border-b dark:border-gray-700 font-semibold">Historial</h3>
-        <ul id="histList" class="divide-y dark:divide-gray-700"></ul>
+      <div id="histPanel" class="absolute top-16 right-6 w-64 max-h-64 overflow-auto bg-white dark:bg-gray-700 border rounded-lg shadow-lg hidden z-10">
+        <h3 class="p-2 border-b dark:border-gray-600 font-semibold">Historial</h3>
+        <ul id="histList" class="divide-y dark:divide-gray-600"></ul>
       </div>
     </section>
 
@@ -101,7 +102,7 @@
     </section>
 
     <!-- TABLA DE EVENTOS -->
-    <section class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+    <section class="bg-white dark:bg-gray-700 p-6 rounded-lg shadow">
       <h2 class="text-2xl font-bold mb-4">Eventos de Ruta</h2>
       <table class="w-full text-left border-collapse">
         <thead>
@@ -118,7 +119,7 @@
     </section>
 
     <!-- SIMULADOR -->
-    <section id="simulador" class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow hidden relative">
+    <section id="simulador" class="bg-white dark:bg-gray-700 p-6 rounded-lg shadow hidden relative">
       <h2 class="text-2xl font-bold mb-4">Simulador de Carga</h2>
       <form id="simForm" onsubmit="simularCarga(); return false;" class="space-y-4" novalidate>
         <div class="relative z-0 w-full group">
@@ -169,7 +170,7 @@
     </section>
 
     <!-- CONTACTO -->
-    <section id="contacto" class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow hidden">
+    <section id="contacto" class="bg-white dark:bg-gray-700 p-6 rounded-lg shadow hidden">
       <h2 class="text-2xl font-bold mb-4">Contacto</h2>
       <form id="contactForm" onsubmit="enviarFormularioPrincipal(event)" class="space-y-6" novalidate>
         <input id="cName" type="text" placeholder="Nombre" required class="w-full border-b-2 border-gray-300 py-2 focus:outline-none invalid:border-red-500"/>
@@ -182,7 +183,7 @@
   </main>
 
   <!-- ESTADÍSTICAS -->
-  <div id="panelEstadisticas" class="fixed bottom-6 left-6 w-80 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg hidden">
+  <div id="panelEstadisticas" class="fixed bottom-6 left-6 w-80 bg-white dark:bg-gray-700 p-6 rounded-lg shadow-lg hidden">
     <button aria-label="Cerrar estadísticas" class="absolute top-2 right-2 text-gray-500 hover:text-gray-700" onclick="togglePanel()">&times;</button>
     <h3 class="text-lg font-semibold mb-4">Estadísticas</h3>
     <p>BL rastreados: <span id="totalCargasPanel">0</span></p>
@@ -201,16 +202,16 @@
   </button>
 
   <!-- CHATBOT -->
-  <div id="chatWindow" class="fixed bottom-24 right-24 w-80 max-h-96 bg-white dark:bg-gray-800 rounded-lg shadow-lg hidden flex-col overflow-hidden">
-    <div id="chatHeader" class="bg-blue-800 dark:bg-gray-700 text-white p-4 font-semibold">Ayuda Shiptrack</div>
+  <div id="chatWindow" class="fixed bottom-24 right-24 w-80 max-h-96 bg-white dark:bg-gray-700 rounded-lg shadow-lg hidden flex-col overflow-hidden">
+    <div id="chatHeader" class="bg-blue-800 dark:bg-gray-600 text-white p-4 font-semibold">Ayuda Shiptrack</div>
     <div id="chatBody" class="p-4 overflow-y-auto flex flex-col space-y-2"></div>
-    <div class="flex border-t dark:border-gray-700">
-      <input id="chatInput" class="flex-1 p-3 bg-gray-50 dark:bg-gray-700 border-none outline-none" placeholder="Escribe tu mensaje...">
+    <div class="flex border-t dark:border-gray-600">
+      <input id="chatInput" class="flex-1 p-3 bg-gray-50 dark:bg-gray-600 border-none outline-none" placeholder="Escribe tu mensaje...">
       <button id="chatSend" class="px-4 bg-blue-600 hover:bg-blue-700 text-white">Enviar</button>
     </div>
   </div>
 
-  <footer class="bg-blue-800 dark:bg-gray-800 text-white text-center p-4">© 2025 Shiptrack • Juan Giraldo & Dylan Díaz</footer>
+  <footer class="bg-blue-800 dark:bg-gray-700 text-white text-center p-4">© 2025 Shiptrack • Juan Giraldo & Dylan Díaz</footer>
 
   <script>
     // Persistir y alternar tema
@@ -327,7 +328,7 @@
         .forEach(code=>{
           const li=document.createElement('li');
           li.textContent=code;
-          li.className='p-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700';
+          li.className='p-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600';
           li.onclick=()=>{ blInput.value=code; toggleHist(); blForm.requestSubmit(); };
           ul.appendChild(li);
         });
@@ -458,4 +459,4 @@
   </script>
 </body>
 </html>
-
+```
